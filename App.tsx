@@ -1,22 +1,15 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { enableScreens } from 'react-native-screens';
-
-// Import your screens
 import LoginScreen from './screens/LoginScreen';
 import FloorDataScreen from './screens/FloorDataScreen';
 
-// Enable native screen optimizations
-enableScreens();
-
-// Define types for navigation
 export type RootStackParamList = {
   Login: undefined;
-  FloorData: { user: any }; // You can replace `any` with a proper user type
+  FloorData: { user: any }; // or proper type instead of 'any'
 };
 
-const Stack = createNativeStackNavigator<RootStackParamList>();
+const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
