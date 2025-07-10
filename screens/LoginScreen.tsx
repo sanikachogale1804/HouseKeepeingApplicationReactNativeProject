@@ -1,7 +1,25 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Button, Alert, SafeAreaView, Image } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  Button,
+  Alert,
+  SafeAreaView,
+  Image,
+} from 'react-native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../App'; // or from '../types' if you split types
+import { useNavigation } from '@react-navigation/native';
 
-function LoginScreen() {
+type LoginScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'Login'
+>;
+
+const LoginScreen: React.FC = () => {
+  const navigation = useNavigation<LoginScreenNavigationProp>();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
@@ -18,25 +36,29 @@ function LoginScreen() {
         }),
       });
 
-      const contentType = response.headers.get('Content-Type');
+      const contentType = response.headers.get('Content-Type') || '';
 
       if (response.ok) {
         const data = contentType.includes('application/json')
           ? await response.json()
           : await response.text();
 
-        console.log('Login successful', data);
         Alert.alert('Success', 'Login successful');
+        navigation.navigate('FloorData', { user: data });
       } else {
         const errorData = contentType.includes('application/json')
           ? await response.json()
           : await response.text();
 
-        console.log('Login failed', errorData);
-        Alert.alert('Login Failed', typeof errorData === 'string' ? errorData : errorData.message || 'Invalid credentials');
+        Alert.alert(
+          'Login Failed',
+          typeof errorData === 'string'
+            ? errorData
+            : errorData.message || 'Invalid credentials'
+        );
       }
     } catch (error) {
-      console.error('Error during login:', error);
+      console.error('Login error:', error);
       Alert.alert('Error', 'Could not connect to server');
     }
   };
@@ -44,7 +66,6 @@ function LoginScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        {/* ✅ Logo added here */}
         <Image source={require('../assets/logo.png')} style={styles.logo} />
 
         <Text style={styles.title}>Login Page</Text>
@@ -63,6 +84,7 @@ function LoginScreen() {
           style={styles.input}
           secureTextEntry
         />
+
         <Button title="Login" onPress={handleLogin} />
       </View>
 
@@ -71,7 +93,7 @@ function LoginScreen() {
       </View>
     </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   safeArea: {
