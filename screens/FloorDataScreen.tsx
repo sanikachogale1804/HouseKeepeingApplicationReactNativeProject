@@ -6,8 +6,13 @@ import {
   Alert,
   StyleSheet,
   TouchableOpacity,
+  Image,
+  Platform, // ✅ Add this line
 } from 'react-native';
+import { launchCamera } from 'react-native-image-picker';
 import { Picker } from '@react-native-picker/picker';
+import { launchImageLibrary } from 'react-native-image-picker';
+
 
 const getSuffix = (n: number) => {
   if (n === 1) return '1st';
@@ -16,11 +21,12 @@ const getSuffix = (n: number) => {
   return `${n}th`;
 };
 
-const getHindiSuffix = (n: number)=>{
-  if(n==1) return 'ली'
-  if(n==2 || n==3) return 'री'
-  return `वीं`
-}
+const getMarathiFloorLabel = (n: number) => {
+  if (n === 1) return '1 ला मजला';
+  if (n === 2 || n === 3) return `${n} रा मजला`;
+  if (n === 4) return '4 था मजला';
+  return `${n} वा मजला`;
+};
 
 const floorOptionsEn = [
   'Basement 2',
@@ -30,15 +36,12 @@ const floorOptionsEn = [
   ...Array.from({ length: 27 }, (_, i) => `${getSuffix(i + 1)} Floor`),
 ];
 
-const floorOptionsHi = [
-  'तलघर 2',
-  'तलघर 1',
+const floorOptionsMr = [
+  'तळमजला 2',
+  'तळमजला 1',
   'भूतल',
-  'एमज़ेड फ्लोर',
-  ...Array.from({ length: 27 }, (_, i) => {
-    const num = i + 1;
-    return `${num}${getHindiSuffix(num)} मंज़िल`;
-  }),
+  'एमझेड मजला',
+  ...Array.from({ length: 27 }, (_, i) => getMarathiFloorLabel(i + 1)),
 ];
 
 const subFloorOptionsEn = [
@@ -53,16 +56,16 @@ const subFloorOptionsEn = [
   'Pantry Area',
 ];
 
-const subFloorOptionsHi = [
+const subFloorOptionsMr = [
   'पूर्व लॉबी क्षेत्र',
   'पश्चिम लॉबी क्षेत्र',
-  'शौचालय',
+  'स्वच्छतागृह',
   'सामान्य क्षेत्र',
-  'पीछे टेराकोटा',
+  'बाहेरील टेराकोटा',
   'मार्बल टेराकोटा',
-  'मीटिंग रूम',
-  'कॉन्फ्रेंस रूम',
-  'पैंट्री क्षेत्र',
+  'बैठक खोली',
+  'परिषद खोली',
+  'पँट्री क्षेत्र',
 ];
 
 const translations = {
@@ -74,33 +77,45 @@ const translations = {
     before: 'Before',
     after: 'After',
     submit: 'Submit',
+    uploadImage: 'Upload Image',
     success: 'Success',
     successMsg: 'Floor data saved successfully!',
     error: 'Error',
   },
-  hi: {
-    title: 'मंजिल डेटा जोड़ें',
-    selectFloor: 'मंजिल चुनें',
-    selectSubFloor: 'उप-मंजिल चुनें',
-    imageType: 'छवि प्रकार',
-    before: 'पहले',
-    after: 'बाद में',
-    submit: 'जमा करें',
-    success: 'सफलता',
-    successMsg: 'मंजिल डेटा सफलतापूर्वक सहेजा गया!',
-    error: 'त्रुटि',
+  mr: {
+    title: 'मजल्याचा डेटा जोडा',
+    selectFloor: 'मजला निवडा',
+    selectSubFloor: 'उप-मजला निवडा',
+    imageType: 'प्रतिमा प्रकार',
+    before: 'पूर्वी',
+    after: 'नंतर',
+    submit: 'सबमिट करा',
+    uploadImage: 'प्रतिमा जोडा',
+    success: 'यशस्वी',
+    successMsg: 'मजल्याचा डेटा यशस्वीरीत्या जतन केला गेला!',
+    error: 'चूक',
   },
 };
 
 const FloorDataScreen = () => {
-  const [language, setLanguage] = useState<'en' | 'hi'>('en');
+  const [language, setLanguage] = useState<'en' | 'mr'>('en');
   const [floorName, setFloorName] = useState(floorOptionsEn[0]);
   const [subFloorName, setSubFloorName] = useState(subFloorOptionsEn[0]);
   const [imageType, setImageType] = useState('BEFORE');
+  const [image, setImage] = useState<any>(null);
 
   const t = translations[language];
-  const floorLabels = language === 'hi' ? floorOptionsHi : floorOptionsEn;
-  const subFloorLabels = language === 'hi' ? subFloorOptionsHi : subFloorOptionsEn;
+  const floorLabels = language === 'mr' ? floorOptionsMr : floorOptionsEn;
+  const subFloorLabels = language === 'mr' ? subFloorOptionsMr : subFloorOptionsEn;
+
+  const captureImage = async () => {
+    const result = await launchCamera({ mediaType: 'photo', cameraType: 'back' });
+
+    if (!result.didCancel && result.assets?.[0]) {
+      setImage(result.assets[0]);
+    }
+  };
+
 
   const handleSubmit = async () => {
     try {
@@ -114,61 +129,88 @@ const FloorDataScreen = () => {
         throw new Error('Failed to save floor data');
       }
 
+      const text = await response.text(); // 🔽 Read raw response
+      console.log('Server responded with:', text);
+
+      let floorDataId;
+
+      try {
+        const savedData = JSON.parse(text); // 🔽 Try parsing JSON
+        floorDataId = savedData.id;
+      } catch (err) {
+        console.error('Failed to parse JSON:', err);
+        throw new Error('Invalid response from server');
+      }
+
+      // Upload the image
+      if (image) {
+        const formData = new FormData();
+
+        formData.append('taskImage', {
+          uri: Platform.OS === 'ios' ? image.uri.replace('file://', '') : image.uri,
+          name: image.fileName || 'photo.jpg',
+          type: image.type || 'image/jpeg',
+        });
+
+        const uploadRes = await fetch(`http://10.0.2.2:8080/floorData/${floorDataId}/image`, {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!uploadRes.ok) {
+          const errorText = await uploadRes.text();
+          throw new Error('Image upload failed: ' + errorText);
+        }
+      }
+
       Alert.alert(t.success, t.successMsg);
       setFloorName(floorOptionsEn[0]);
       setSubFloorName(subFloorOptionsEn[0]);
       setImageType('BEFORE');
+      setImage(null);
     } catch (err) {
       Alert.alert(t.error, (err as Error).message);
     }
   };
 
+
   return (
     <View style={styles.container}>
-      {/* Language Selector */}
+      {/* Language Switch */}
       <View style={styles.languageSwitch}>
         <TouchableOpacity onPress={() => setLanguage('en')}>
           <Text style={[styles.langBtn, language === 'en' && styles.activeLang]}>English</Text>
         </TouchableOpacity>
         <Text style={styles.separator}>|</Text>
-        <TouchableOpacity onPress={() => setLanguage('hi')}>
-          <Text style={[styles.langBtn, language === 'hi' && styles.activeLang]}>हिंदी</Text>
+        <TouchableOpacity onPress={() => setLanguage('mr')}>
+          <Text style={[styles.langBtn, language === 'mr' && styles.activeLang]}>मराठी</Text>
         </TouchableOpacity>
       </View>
 
       <Text style={styles.title}>{t.title}</Text>
 
       <Text style={styles.label}>{t.selectFloor}</Text>
-      <Picker
-        selectedValue={floorName}
-        onValueChange={setFloorName}
-        style={styles.input}
-      >
+      <Picker selectedValue={floorName} onValueChange={setFloorName} style={styles.input}>
         {floorOptionsEn.map((value, idx) => (
           <Picker.Item key={value} label={floorLabels[idx]} value={value} />
         ))}
       </Picker>
 
       <Text style={styles.label}>{t.selectSubFloor}</Text>
-      <Picker
-        selectedValue={subFloorName}
-        onValueChange={setSubFloorName}
-        style={styles.input}
-      >
+      <Picker selectedValue={subFloorName} onValueChange={setSubFloorName} style={styles.input}>
         {subFloorOptionsEn.map((value, idx) => (
           <Picker.Item key={value} label={subFloorLabels[idx]} value={value} />
         ))}
       </Picker>
 
       <Text style={styles.label}>{t.imageType}</Text>
-      <Picker
-        selectedValue={imageType}
-        onValueChange={setImageType}
-        style={styles.input}
-      >
+      <Picker selectedValue={imageType} onValueChange={setImageType} style={styles.input}>
         <Picker.Item label={t.before} value="BEFORE" />
         <Picker.Item label={t.after} value="AFTER" />
       </Picker>
+
+      <Button title={t.uploadImage} onPress={captureImage} />
+      {image && <Image source={{ uri: image.uri }} style={{ width: 200, height: 200, marginTop: 10 }} />}
 
       <Button title={t.submit} onPress={handleSubmit} />
     </View>
@@ -177,40 +219,13 @@ const FloorDataScreen = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, justifyContent: 'center' },
-  title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  input: {
-    borderWidth: 1,
-    padding: 10,
-    marginBottom: 15,
-    borderRadius: 5,
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 5,
-  },
-  languageSwitch: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    marginBottom: 10,
-  },
-  langBtn: {
-    fontSize: 16,
-    color: '#555',
-    paddingHorizontal: 5,
-  },
-  separator: {
-    fontSize: 16,
-    color: '#555',
-  },
-  activeLang: {
-    fontWeight: 'bold',
-    color: '#000',
-  },
+  title: { fontSize: 22, fontWeight: 'bold', textAlign: 'center', marginBottom: 20 },
+  input: { borderWidth: 1, padding: 10, marginBottom: 15, borderRadius: 5 },
+  label: { fontSize: 16, marginBottom: 5 },
+  languageSwitch: { flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 10 },
+  langBtn: { fontSize: 16, color: '#555', paddingHorizontal: 5 },
+  separator: { fontSize: 16, color: '#555' },
+  activeLang: { fontWeight: 'bold', color: '#000' },
 });
 
 export default FloorDataScreen;
