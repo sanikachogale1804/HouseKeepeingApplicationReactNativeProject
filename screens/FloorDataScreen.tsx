@@ -12,6 +12,7 @@ import {
 import { launchCamera } from 'react-native-image-picker';
 import { Picker } from '@react-native-picker/picker';
 import { launchImageLibrary } from 'react-native-image-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const getSuffix = (n: number) => {
@@ -116,9 +117,9 @@ const FloorDataScreen = () => {
     }
   };
 
-
   const handleSubmit = async () => {
     try {
+      // Step 1: Save floor data (JSON)
       const response = await fetch('http://10.0.2.2:8080/floorData', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -129,37 +130,49 @@ const FloorDataScreen = () => {
         throw new Error('Failed to save floor data');
       }
 
-      const text = await response.text(); // 🔽 Read raw response
-      console.log('Server responded with:', text);
-
-      let floorDataId;
-
-      try {
-        const savedData = JSON.parse(text); // 🔽 Try parsing JSON
-        floorDataId = savedData.id;
-      } catch (err) {
-        console.error('Failed to parse JSON:', err);
-        throw new Error('Invalid response from server');
+      // ✅ Extract ID from Location header
+      const locationHeader = response.headers.get('Location');
+      if (!locationHeader) {
+        throw new Error("Missing 'Location' header in response");
       }
 
-      // Upload the image
-      if (image) {
-        const formData = new FormData();
+      const floorDataId = locationHeader.split('/').pop();
+      console.log('📦 FloorData ID:', floorDataId);
 
-        formData.append('taskImage', {
-          uri: Platform.OS === 'ios' ? image.uri.replace('file://', '') : image.uri,
-          name: image.fileName || 'photo.jpg',
+      // ✅ Get token from AsyncStorage
+      const token = await AsyncStorage.getItem('access_token');
+      console.log('🪪 Retrieved token:', token);
+      if (!token) {
+        throw new Error('No access token found. Please login again.');
+      }
+
+      // ✅ Upload image if available
+      if (image && floorDataId) {
+        const photo = {
+          uri: image.uri,
+          name: image.fileName || `photo_${Date.now()}.jpg`,
           type: image.type || 'image/jpeg',
-        });
+        };
 
-        const uploadRes = await fetch(`http://10.0.2.2:8080/floorData/${floorDataId}/image`, {
+        const formData = new FormData();
+        formData.append('taskImage', photo); // 👈 backend expects taskImage
+
+        console.log('Uploading image...', photo);
+
+        const res = await fetch(`http://10.0.2.2:8080/floorData/${floorDataId}/image`, {
           method: 'POST',
           body: formData,
+          headers: {
+            Accept: 'application/json',
+            Authorization: `Bearer ${token}`, // ✅ AUTH FIX
+          },
         });
 
-        if (!uploadRes.ok) {
-          const errorText = await uploadRes.text();
-          throw new Error('Image upload failed: ' + errorText);
+        const resText = await res.text();
+        console.log('Upload response:', res.status, resText);
+
+        if (!res.ok) {
+          throw new Error('Image upload failed: ' + resText);
         }
       }
 

@@ -12,6 +12,7 @@ import {
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../App'; // or from '../types' if you split types
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // ⬅️ Add this at the top
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -36,32 +37,31 @@ const LoginScreen: React.FC = () => {
         }),
       });
 
-      const contentType = response.headers.get('Content-Type') || '';
-
       if (response.ok) {
-        const data = contentType.includes('application/json')
-          ? await response.json()
-          : await response.text();
+        const token = await response.text(); // ✅ plain text token
+
+        if (!token || token.length < 10) {
+          throw new Error('Token missing in response');
+        }
+
+        // ✅ Save token to AsyncStorage
+        await AsyncStorage.setItem('access_token', token);
+        console.log('🔐 Token saved to AsyncStorage:', token);
 
         Alert.alert('Success', 'Login successful');
-        navigation.navigate('FloorData', { user: data });
-      } else {
-        const errorData = contentType.includes('application/json')
-          ? await response.json()
-          : await response.text();
 
-        Alert.alert(
-          'Login Failed',
-          typeof errorData === 'string'
-            ? errorData
-            : errorData.message || 'Invalid credentials'
-        );
+        // You can pass minimal user info or token if needed
+        navigation.navigate('FloorData', { user: { username } });
+      } else {
+        const errorText = await response.text();
+        Alert.alert('Login Failed', errorText || 'Invalid credentials');
       }
     } catch (error) {
       console.error('Login error:', error);
       Alert.alert('Error', 'Could not connect to server');
     }
   };
+
 
   return (
     <SafeAreaView style={styles.safeArea}>
