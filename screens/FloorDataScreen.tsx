@@ -150,7 +150,18 @@ const FloorDataScreen = () => {
       if (image && floorDataId) {
         const sanitize = (str: string) => str.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
 
-        const customFileName = `${sanitize(floorName)}-${sanitize(subFloorName)}-${imageType}.jpg`;
+        const getFormattedTimestamp = () => {
+          const now = new Date();
+          const pad = (n: number) => String(n).padStart(2, '0');
+          const year = now.getFullYear();
+          const month = pad(now.getMonth() + 1);
+          const day = pad(now.getDate());
+          const hours = pad(now.getHours());
+          const minutes = pad(now.getMinutes());
+          return `${year}-${month}-${day}-${hours}-${minutes}`;
+        };
+
+        const customFileName = `${sanitize(floorName)}-${sanitize(subFloorName)}-${imageType}-${getFormattedTimestamp()}.jpg`;
 
         const photo = {
           uri: image.uri,
