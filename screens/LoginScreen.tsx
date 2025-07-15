@@ -4,15 +4,17 @@ import {
   Text,
   StyleSheet,
   TextInput,
-  Button,
+  TouchableOpacity,
   Alert,
   SafeAreaView,
   Image,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../App'; // or from '../types' if you split types
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // ⬅️ Add this at the top
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { RootStackParamList } from '../App';
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -28,48 +30,40 @@ const LoginScreen: React.FC = () => {
     try {
       const response = await fetch('http://10.0.2.2:8080/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: username,
-          userPassword: password,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, userPassword: password }),
       });
 
       if (response.ok) {
-        const token = await response.text(); // ✅ plain text token
+        const token = await response.text();
 
         if (!token || token.length < 10) {
           throw new Error('Token missing in response');
         }
 
-        // ✅ Save token to AsyncStorage
         await AsyncStorage.setItem('access_token', token);
-        console.log('🔐 Token saved to AsyncStorage:', token);
-
-        Alert.alert('Success', 'Login successful');
-
-        // You can pass minimal user info or token if needed
+        Alert.alert('✅ Success', 'Login successful');
         navigation.navigate('FloorData', { user: { username } });
       } else {
         const errorText = await response.text();
-        Alert.alert('Login Failed', errorText || 'Invalid credentials');
+        Alert.alert('❌ Login Failed', errorText || 'Invalid credentials');
       }
     } catch (error) {
       console.error('Login error:', error);
-      Alert.alert('Error', 'Could not connect to server');
+      Alert.alert('⚠️ Error', 'Could not connect to server');
     }
   };
 
-
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
         <Image source={require('../assets/logo.png')} style={styles.logo} />
 
-        <Text style={styles.title}>Login Page</Text>
-
+        <Text style={styles.title}>Housekeeping Login</Text>
+        
         <TextInput
           placeholder="Username"
           value={username}
@@ -85,11 +79,16 @@ const LoginScreen: React.FC = () => {
           secureTextEntry
         />
 
-        <Button title="Login" onPress={handleLogin} />
-      </View>
+        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+          <Text style={styles.loginButtonText}>Login</Text>
+        </TouchableOpacity>
+
+
+        <Text style={styles.note}>Only authorized staff members can log in.</Text>
+      </KeyboardAvoidingView>
 
       <View style={styles.footer}>
-        <Text style={styles.footerText}>© All rights reserved by Cogent Safety</Text>
+        <Text style={styles.footerText}>© 2025 Cogent Safety – Housekeeping App</Text>
       </View>
     </SafeAreaView>
   );
@@ -98,38 +97,59 @@ const LoginScreen: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f0f4f7',
   },
   container: {
     flex: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
     justifyContent: 'center',
     alignItems: 'center',
   },
   logo: {
-    width: 120,
-    height: 120,
-    marginBottom: 20,
+    width: 110,
+    height: 110,
+    marginBottom: 24,
     resizeMode: 'contain',
   },
   title: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    marginBottom: 20,
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#333',
+    marginBottom: 24,
   },
   input: {
     width: '100%',
-    borderWidth: 1,
+    backgroundColor: '#fff',
     borderColor: '#ccc',
-    padding: 12,
-    marginBottom: 15,
-    borderRadius: 8,
+    borderWidth: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     fontSize: 16,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  loginButton: {
+    width: '100%',
+    backgroundColor: '#00695c',
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  loginButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  note: {
+    fontSize: 12,
+    color: '#777',
+    marginTop: 16,
+    textAlign: 'center',
   },
   footer: {
-    padding: 20,
     alignItems: 'center',
-    justifyContent: 'center',
+    padding: 16,
   },
   footerText: {
     fontSize: 12,
