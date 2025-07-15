@@ -148,14 +148,18 @@ const FloorDataScreen = () => {
 
       // ✅ Upload image if available
       if (image && floorDataId) {
+        const sanitize = (str: string) => str.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+
+        const customFileName = `${sanitize(floorName)}-${sanitize(subFloorName)}-${imageType}.jpg`;
+
         const photo = {
           uri: image.uri,
-          name: image.fileName || `photo_${Date.now()}.jpg`,
+          name: customFileName,
           type: image.type || 'image/jpeg',
         };
 
         const formData = new FormData();
-        formData.append('taskImage', photo); // 👈 backend expects taskImage
+        formData.append('taskImage', photo);
 
         console.log('Uploading image...', photo);
 
