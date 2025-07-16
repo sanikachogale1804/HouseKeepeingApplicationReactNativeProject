@@ -97,7 +97,7 @@ const FloorDataScreen = () => {
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch('http://10.0.2.2:8080/floorData', {
+      const response = await fetch('http://192.168.1.92:8080/floorData', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ floorName, subFloorName, imageType }),
@@ -115,7 +115,7 @@ const FloorDataScreen = () => {
       if (image && floorDataId) {
         const sanitize = (str: string) => str.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
         const now = new Date();
-        const customFileName = `${sanitize(floorName)}-${sanitize(subFloorName)}-${imageType}-${now.toISOString().slice(0,16).replace(/[:T]/g, '-')}.jpg`;
+        const customFileName = `${sanitize(floorName)}-${sanitize(subFloorName)}-${imageType}-${now.toISOString().slice(0, 16).replace(/[:T]/g, '-')}.jpg`;
 
         const formData = new FormData();
         formData.append('taskImage', {
@@ -124,7 +124,7 @@ const FloorDataScreen = () => {
           type: image.type || 'image/jpeg',
         });
 
-        const res = await fetch(`http://10.0.2.2:8080/floorData/${floorDataId}/image`, {
+        const res = await fetch(`http://192.168.1.92:8080/floorData/${floorDataId}/image`, {
           method: 'POST',
           body: formData,
           headers: {
@@ -166,14 +166,16 @@ const FloorDataScreen = () => {
         <Text style={styles.label}>{t.selectFloor}</Text>
         <Picker selectedValue={floorName} onValueChange={setFloorName} style={styles.input}>
           {floorOptionsEn.map((value, idx) => (
-            <Picker.Item key={value} label={floorLabels[idx]} value={value} />
+            <Picker.Item key={`floor-${idx}`} label={floorLabels[idx]} value={value} />
+
           ))}
         </Picker>
 
         <Text style={styles.label}>{t.selectSubFloor}</Text>
         <Picker selectedValue={subFloorName} onValueChange={setSubFloorName} style={styles.input}>
           {subFloorOptionsEn.map((value, idx) => (
-            <Picker.Item key={value} label={subFloorLabels[idx]} value={value} />
+            <Picker.Item key={`subfloor-${idx}`} label={subFloorLabels[idx]} value={value} />
+
           ))}
         </Picker>
 

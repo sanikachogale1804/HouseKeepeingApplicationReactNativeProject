@@ -27,32 +27,37 @@ const LoginScreen: React.FC = () => {
   const [password, setPassword] = useState('');
 
   const handleLogin = async () => {
+    console.log('📲 Login button clicked');
+
     try {
-      const response = await fetch('http://10.0.2.2:8080/login', {
+      const response = await fetch('http://192.168.1.92:8080/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, userPassword: password }),
       });
 
-      if (response.ok) {
-        const token = await response.text();
+      console.log('📡 HTTP Status:', response.status);
 
-        if (!token || token.length < 10) {
+      const responseBody = await response.text();
+      console.log('🧾 Response Body:', responseBody);
+
+      if (response.ok) {
+        if (!responseBody || responseBody.length < 10) {
           throw new Error('Token missing in response');
         }
 
-        await AsyncStorage.setItem('access_token', token);
+        await AsyncStorage.setItem('access_token', responseBody);
         Alert.alert('✅ Success', 'Login successful');
         navigation.navigate('FloorData', { user: { username } });
       } else {
-        const errorText = await response.text();
-        Alert.alert('❌ Login Failed', errorText || 'Invalid credentials');
+        Alert.alert('❌ Login Failed', responseBody || 'Invalid credentials');
       }
     } catch (error) {
       console.error('Login error:', error);
       Alert.alert('⚠️ Error', 'Could not connect to server');
     }
   };
+
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -63,7 +68,7 @@ const LoginScreen: React.FC = () => {
         <Image source={require('../assets/logo.png')} style={styles.logo} />
 
         <Text style={styles.title}>Housekeeping Login</Text>
-        
+
         <TextInput
           placeholder="Username"
           value={username}
