@@ -97,7 +97,16 @@ const FloorDataScreen = () => {
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch('http://192.168.1.92:8080/floorData', {
+      const localhostIP = 'http://10.0.2.2:5005'; // Android Emulator
+      const lanIP = 'http://192.168.1.92:5005';   // LAN IP (your PC)
+      const publicIP = 'http://45.115.186.228:5005'; // Public IP
+
+      // Smart selection based on environment
+      const baseUrl = __DEV__ ? lanIP : publicIP;
+
+
+      // Save floor data
+      const response = await fetch(`${baseUrl}/floorData`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ floorName, subFloorName, imageType }),
@@ -124,7 +133,7 @@ const FloorDataScreen = () => {
           type: image.type || 'image/jpeg',
         });
 
-        const res = await fetch(`http://192.168.1.92:8080/floorData/${floorDataId}/image`, {
+        const res = await fetch(`${baseUrl}/floorData/${floorDataId}/image`, {
           method: 'POST',
           body: formData,
           headers: {

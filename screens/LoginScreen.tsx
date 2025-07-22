@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -26,27 +26,48 @@ const LoginScreen: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
+  useEffect(() => {
+    const loadSavedCredentials = async () => {
+      try {
+        const savedUsername = await AsyncStorage.getItem('savedUsername');
+        const savedPassword = await AsyncStorage.getItem('savedPassword');
+        if (savedUsername) setUsername(savedUsername);
+        if (savedPassword) setPassword(savedPassword);
+      } catch (e) {
+        console.error('🔐 Failed to load saved credentials:', e);
+      }
+    };
+    loadSavedCredentials();
+  }, []);
+
   const handleLogin = async () => {
     console.log('📲 Login button clicked');
 
     try {
-      const response = await fetch('http://192.168.1.92:8080/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, userPassword: password }),
-      });
+      const localhostIP = 'http://10.0.2.2:5005';
+      const localNetworkIP = 'http://192.168.1.92:5005';
+      const publicIP = 'http://45.115.186.228:5005';
 
-      console.log('📡 HTTP Status:', response.status);
+      const baseUrl = __DEV__ ? localNetworkIP : publicIP;
+      const url = `${baseUrl}/login?username=${username}&userPassword=${password}`;
+      console.log('🌐 API URL:', url);
 
+      const response = await fetch(url);
       const responseBody = await response.text();
+
       console.log('🧾 Response Body:', responseBody);
+      console.log('📡 HTTP Status:', response.status);
 
       if (response.ok) {
         if (!responseBody || responseBody.length < 10) {
           throw new Error('Token missing in response');
         }
 
+        // ✅ Save token and credentials
         await AsyncStorage.setItem('access_token', responseBody);
+        await AsyncStorage.setItem('savedUsername', username);
+        await AsyncStorage.setItem('savedPassword', password);
+
         Alert.alert('✅ Success', 'Login successful');
         navigation.navigate('FloorData', { user: { username } });
       } else {
@@ -57,7 +78,6 @@ const LoginScreen: React.FC = () => {
       Alert.alert('⚠️ Error', 'Could not connect to server');
     }
   };
-
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -87,7 +107,6 @@ const LoginScreen: React.FC = () => {
         <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
           <Text style={styles.loginButtonText}>Login</Text>
         </TouchableOpacity>
-
 
         <Text style={styles.note}>Only authorized staff members can log in.</Text>
       </KeyboardAvoidingView>
