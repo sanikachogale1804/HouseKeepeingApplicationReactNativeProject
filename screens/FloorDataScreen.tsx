@@ -13,6 +13,9 @@ import {
 import { Picker } from '@react-native-picker/picker';
 import { launchCamera } from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Image as RNImage } from 'react-native-compressor';
+import RNFS from 'react-native-fs'; 
+
 
 const getSuffix = (n: number) => {
   if (n === 1) return '1st';
@@ -97,15 +100,11 @@ const FloorDataScreen = () => {
 
   const handleSubmit = async () => {
     try {
-      const localhostIP = 'http://10.0.2.2:5005'; // Android Emulator
-      const lanIP = 'http://192.168.1.92:5005';   // LAN IP (your PC)
-      const publicIP = 'http://45.115.186.228:5005'; // Public IP
-
-      // Smart selection based on environment
+      const localhostIP = 'http://10.0.2.2:5005';
+      const lanIP = 'http://192.168.1.92:5005';
+      const publicIP = 'http://45.115.186.228:5005';
       const baseUrl = __DEV__ ? lanIP : publicIP;
 
-
-      // Save floor data
       const response = await fetch(`${baseUrl}/floorData`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -115,25 +114,50 @@ const FloorDataScreen = () => {
       if (!response.ok) throw new Error('Failed to save floor data');
 
       const locationHeader = response.headers.get('Location');
-      if (!locationHeader) throw new Error("Missing 'Location' header in response");
+      if (!locationHeader) throw new Error("Missing 'Location' header");
       const floorDataId = locationHeader.split('/').pop();
 
       const token = await AsyncStorage.getItem('access_token');
-      if (!token) throw new Error('No access token found. Please login again.');
+      if (!token) throw new Error('No access token found');
 
+      // Inside handleSubmit...
       if (image && floorDataId) {
-        const sanitize = (str: string) => str.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+        const sanitize = (str: string) =>
+          str.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
         const now = new Date();
-        const customFileName = `${sanitize(floorName)}-${sanitize(subFloorName)}-${imageType}-${now.toISOString().slice(0, 16).replace(/[:T]/g, '-')}.jpg`;
+        const pad = (n: number) => (n < 10 ? `0${n}` : n);
+        const customFileName = `${sanitize(floorName)}-${sanitize(
+          subFloorName
+        )}-${imageType}-${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(
+          now.getDate()
+        )}-${pad(now.getHours())}-${pad(now.getMinutes())}.jpg`;
+
+        // 🔽 Compress until size < 512KB
+        let quality = 0.8;
+        let compressedImageUri = image.uri;
+        let fileSizeKB = Number.MAX_VALUE;
+
+        while (fileSizeKB > 512 && quality >= 0.2) {
+          compressedImageUri = await RNImage.compress(image.uri, {
+            compressionMethod: 'auto',
+            quality,
+            maxWidth: 1280,
+            maxHeight: 1280,
+          });
+
+          const stat = await RNFS.stat(compressedImageUri);
+          fileSizeKB = stat.size / 1024;
+          if (fileSizeKB > 512) quality -= 0.1;
+        }
 
         const formData = new FormData();
         formData.append('taskImage', {
-          uri: image.uri,
+          uri: compressedImageUri,
           name: customFileName,
           type: image.type || 'image/jpeg',
         });
 
-        const res = await fetch(`${baseUrl}/floorData/${floorDataId}/image`, {
+        const uploadRes = await fetch(`${baseUrl}/floorData/${floorDataId}/image`, {
           method: 'POST',
           body: formData,
           headers: {
@@ -142,8 +166,10 @@ const FloorDataScreen = () => {
           },
         });
 
-        if (!res.ok) throw new Error('Image upload failed: ' + (await res.text()));
+        if (!uploadRes.ok)
+          throw new Error('Image upload failed: ' + (await uploadRes.text()));
       }
+
 
       Alert.alert(t.success, t.successMsg);
       setFloorName(floorOptionsEn[0]);
