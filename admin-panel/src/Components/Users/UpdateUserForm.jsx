@@ -5,6 +5,7 @@ function UpdateUserForm({ user, onSuccess, onCancel }) {
     const [formData, setFormData] = useState({
         username: user.username || '',
         userPassword: '',
+        confirmPassword: '',
         role: user.role || ''
     });
 
@@ -19,6 +20,11 @@ function UpdateUserForm({ user, onSuccess, onCancel }) {
 
     const handleUpdate = (e) => {
         e.preventDefault();
+        if (formData.userPassword && formData.userPassword !== formData.confirmPassword) {
+            alert("Password and confirm password do not match");
+            return;
+        }
+
         const userId = extractIdFromHref(user._links.self.href);
 
         axios.put(`http://localhost:5005/users/${userId}`, formData)
@@ -31,6 +37,22 @@ function UpdateUserForm({ user, onSuccess, onCancel }) {
                 alert("Failed to update user");
             });
     };
+
+    const handleDelete = async () => {
+        const confirmDelete = window.confirm(`Are you sure you want to delete ${formData.username}?`);
+        if (!confirmDelete) return;
+
+        try {
+            const userId = extractIdFromHref(user._links.self.href); // 💡 FIX HERE
+            await axios.delete(`http://localhost:5005/users/${userId}`);
+            alert("User deleted successfully.");
+            onSuccess(); // Refresh user list or close modal
+        } catch (error) {
+            console.error("Error deleting user:", error);
+            alert("Failed to delete user. Make sure you're authorized.");
+        }
+    };
+
 
     return (
         <form onSubmit={handleUpdate} style={{ marginBottom: '20px' }}>
@@ -50,6 +72,13 @@ function UpdateUserForm({ user, onSuccess, onCancel }) {
                 value={formData.userPassword}
                 onChange={handleChange}
             />
+            <input
+                type="password"
+                name="confirmPassword"
+                placeholder="Confirm Password"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+            />
             <select
                 name="role"
                 value={formData.role}
@@ -66,6 +95,22 @@ function UpdateUserForm({ user, onSuccess, onCancel }) {
             <button type="button" onClick={onCancel} style={{ marginLeft: '10px' }}>
                 Cancel
             </button>
+            <button
+                type="button" // <-- Important! Prevents form submission
+                onClick={handleDelete}
+                style={{
+                    backgroundColor: "red",
+                    color: "white",
+                    padding: "8px 16px",
+                    border: "none",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                    marginTop: "10px"
+                }}
+            >
+                Delete User
+            </button>
+
         </form>
     );
 }

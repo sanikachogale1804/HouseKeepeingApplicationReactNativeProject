@@ -9,7 +9,9 @@ function AdminPanel() {
     userPassword: '',
     role: ''
   });
-  const [editingUser, setEditingUser] = useState(null); // selected user object
+  const [editingUser, setEditingUser] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedRole, setSelectedRole] = useState(''); // 🔽 Role filter
 
   useEffect(() => {
     fetchUsers();
@@ -36,8 +38,8 @@ function AdminPanel() {
   const handleAddUser = (e) => {
     e.preventDefault();
     axios.post('http://localhost:5005/register', newUser)
-      .then(response => {
-        console.log("User added:", response.data);
+      .then(() => {
+        alert("User Added Successfully!");
         setNewUser({ username: '', userPassword: '', role: '' });
         fetchUsers();
       })
@@ -48,16 +50,45 @@ function AdminPanel() {
 
   const handleEditSuccess = () => {
     setEditingUser(null);
-    fetchUsers(); // Refresh list after update
+    fetchUsers();
   };
 
   const handleEditClick = (user) => {
-    setEditingUser(user); // pass whole user object
+    setEditingUser(user);
   };
+
+  // ✅ Filter users by username AND role
+  const filteredUsers = users.filter(user =>
+    user.username.toLowerCase().includes(searchTerm.toLowerCase()) &&
+    (selectedRole === '' || user.role === selectedRole)
+  );
 
   return (
     <div style={{ padding: '20px' }}>
       <h2>User Management</h2>
+
+      {/* 🔍 Search input + 🔽 Role filter */}
+      <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+        <input
+          type="text"
+          placeholder="Search by username"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{ padding: '5px', width: '200px' }}
+        />
+
+        <select
+          value={selectedRole}
+          onChange={(e) => setSelectedRole(e.target.value)}
+          style={{ padding: '5px' }}
+        >
+          <option value="">All Roles</option>
+          <option value="ADMIN">Admin</option>
+          <option value="USER">User</option>
+          <option value="HOUSEKEEPER">Housekeeper</option>
+          <option value="SUPERVISOR">Supervisor</option>
+        </select>
+      </div>
 
       <form onSubmit={handleAddUser} style={{ marginBottom: '20px' }}>
         <input
@@ -98,11 +129,11 @@ function AdminPanel() {
         />
       ) : (
         <>
-          {users.length === 0 ? (
+          {filteredUsers.length === 0 ? (
             <p>No users found.</p>
           ) : (
             <ul>
-              {users.map((user) => (
+              {filteredUsers.map((user) => (
                 <li key={user.id}>
                   {user.username} – {user.role}
                   <button onClick={() => handleEditClick(user)} style={{ marginLeft: '10px' }}>
@@ -114,7 +145,6 @@ function AdminPanel() {
           )}
         </>
       )}
-
     </div>
   );
 }
