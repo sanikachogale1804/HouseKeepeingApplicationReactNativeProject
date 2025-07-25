@@ -1,17 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import UpdateUserForm from './UpdateUserForm';
+import '../CSS/AdminPanel.css'; // assuming the CSS you gave is saved here
 
 function AdminPanel() {
   const [users, setUsers] = useState([]);
-  const [newUser, setNewUser] = useState({
-    username: '',
-    userPassword: '',
-    role: ''
-  });
+  const [newUser, setNewUser] = useState({ username: '', userPassword: '', role: '' });
   const [editingUser, setEditingUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedRole, setSelectedRole] = useState(''); // 🔽 Role filter
+  const [selectedRole, setSelectedRole] = useState('');
 
   useEffect(() => {
     fetchUsers();
@@ -48,103 +45,120 @@ function AdminPanel() {
       });
   };
 
+  const handleEditClick = (user) => {
+    setEditingUser(user);
+  };
+
   const handleEditSuccess = () => {
     setEditingUser(null);
     fetchUsers();
   };
 
-  const handleEditClick = (user) => {
-    setEditingUser(user);
-  };
-
-  // ✅ Filter users by username AND role
   const filteredUsers = users.filter(user =>
     user.username.toLowerCase().includes(searchTerm.toLowerCase()) &&
     (selectedRole === '' || user.role === selectedRole)
   );
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h2>User Management</h2>
-
-      {/* 🔍 Search input + 🔽 Role filter */}
-      <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
-        <input
-          type="text"
-          placeholder="Search by username"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          style={{ padding: '5px', width: '200px' }}
-        />
-
-        <select
-          value={selectedRole}
-          onChange={(e) => setSelectedRole(e.target.value)}
-          style={{ padding: '5px' }}
-        >
-          <option value="">All Roles</option>
-          <option value="ADMIN">Admin</option>
-          <option value="USER">User</option>
-          <option value="HOUSEKEEPER">Housekeeper</option>
-          <option value="SUPERVISOR">Supervisor</option>
-        </select>
+    <div className="admin-container">
+      {/* Sidebar */}
+      <div className="sidebar">
+        <div className="sidebar-logo">
+          <img src="" alt="Logo" className="logo" />
+        </div>
+        <div className="admin-title">Admin Panel</div>
+        <ul className="sidebar-links">
+          <li><a className="sidebar-link" href="/">Dashboard</a></li>
+          <li><a className="sidebar-link" href="/admin">User Management</a></li>
+        </ul>
       </div>
 
-      <form onSubmit={handleAddUser} style={{ marginBottom: '20px' }}>
-        <input
-          type="text"
-          name="username"
-          placeholder="Username"
-          value={newUser.username}
-          onChange={handleInputChange}
-          required
-        />
-        <input
-          type="password"
-          name="userPassword"
-          placeholder="Password"
-          value={newUser.userPassword}
-          onChange={handleInputChange}
-          required
-        />
-        <select
-          name="role"
-          value={newUser.role}
-          onChange={handleInputChange}
-          required
-        >
-          <option value="">Select Role</option>
-          <option value="ADMIN">Admin</option>
-          <option value="USER">User</option>
-          <option value="HOUSEKEEPER">Housekeeper</option>
-          <option value="SUPERVISOR">Supervisor</option>
-        </select>
-        <button type="submit">Add User</button>
-      </form>
+      {/* Main Panel */}
+      <div className="dashboard-container" style={{ marginLeft: '260px', padding: '20px' }}>
+        <div className="admin-header-buttons">
+          <button className="home-button-admin">Home</button>
+          <button className="logout-button-admin">Logout</button>
+        </div>
 
-      {editingUser ? (
-        <UpdateUserForm
-          user={editingUser}
-          onSuccess={handleEditSuccess}
-        />
-      ) : (
-        <>
-          {filteredUsers.length === 0 ? (
+        <div className="controls-container">
+          <div className="filter-search-container">
+            <input
+              type="text"
+              placeholder="Search by username"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+
+            <select value={selectedRole} onChange={(e) => setSelectedRole(e.target.value)}>
+              <option value="">All Roles</option>
+              <option value="ADMIN">Admin</option>
+              <option value="USER">User</option>
+              <option value="HOUSEKEEPER">Housekeeper</option>
+              <option value="SUPERVISOR">Supervisor</option>
+            </select>
+          </div>
+
+          <form onSubmit={handleAddUser} className="assign-ticket-container" style={{ marginTop: '10px' }}>
+            <input
+              type="text"
+              name="username"
+              placeholder="Username"
+              value={newUser.username}
+              onChange={handleInputChange}
+              required
+            />
+            <input
+              type="password"
+              name="userPassword"
+              placeholder="Password"
+              value={newUser.userPassword}
+              onChange={handleInputChange}
+              required
+            />
+            <select name="role" value={newUser.role} onChange={handleInputChange} required>
+              <option value="">Select Role</option>
+              <option value="ADMIN">Admin</option>
+              <option value="USER">User</option>
+              <option value="HOUSEKEEPER">Housekeeper</option>
+              <option value="SUPERVISOR">Supervisor</option>
+            </select>
+            <button type="submit">Add User</button>
+          </form>
+        </div>
+
+        <div className="ticket-list-container">
+          <h3>User List</h3>
+
+          {editingUser ? (
+            <UpdateUserForm user={editingUser} onSuccess={handleEditSuccess} />
+          ) : filteredUsers.length === 0 ? (
             <p>No users found.</p>
           ) : (
-            <ul>
-              {filteredUsers.map((user) => (
-                <li key={user.id}>
-                  {user.username} – {user.role}
-                  <button onClick={() => handleEditClick(user)} style={{ marginLeft: '10px' }}>
-                    Edit
-                  </button>
-                </li>
-              ))}
-            </ul>
+            <table className="ticket-table">
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Role</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredUsers.map(user => (
+                  <tr key={user.id}>
+                    <td>{user.username}</td>
+                    <td>
+                      <span className={`status-label ${user.role.toLowerCase()}`}>{user.role}</span>
+                    </td>
+                    <td>
+                      <button onClick={() => handleEditClick(user)}>Edit</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           )}
-        </>
-      )}
+        </div>
+      </div>
     </div>
   );
 }

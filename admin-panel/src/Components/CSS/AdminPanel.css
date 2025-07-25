@@ -1,0 +1,268 @@
+/* Layout */
+.admin-container {
+  display: flex;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 240px;
+  height: 100vh;
+  background-color: #1e2a38;
+  padding: 20px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-right: 1px solid #ccc;
+}
+
+.sidebar-logo img.logo {
+  width: 60px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+}
+
+.admin-title {
+  color: white;
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.sidebar-links {
+  list-style-type: none;
+  padding: 0;
+  width: 100%;
+}
+
+.sidebar-link {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  margin: 8px 0;
+  color: #ecf0f1;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: background-color 0.3s;
+}
+
+.sidebar-link:hover {
+  background-color: #34495e;
+}
+
+/* Header Buttons */
+.admin-header-buttons {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.home-button-admin,
+.logout-button-admin {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.home-button-admin {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.logout-button-admin {
+  background-color: #f44336;
+  color: white;
+}
+
+.home-button-admin:hover {
+  background-color: #45a049;
+}
+
+.logout-button-admin:hover {
+  background-color: #d32f2f;
+}
+
+/* Content Layout */
+.dashboard-container {
+  margin-left: 260px;
+  padding: 30px;
+  background-color: #f3f4f6;
+  min-height: 100vh;
+  color: #333;
+}
+
+/* Controls */
+.controls-container {
+  background-color: #34495e;
+  padding: 20px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  color: white;
+  margin-bottom: 20px;
+}
+
+.controls-container input,
+.controls-container select,
+.controls-container button {
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 5px;
+  border: none;
+  background-color: #34495e;
+  color: white;
+}
+
+.controls-container input::placeholder {
+  color: #ccc;
+}
+
+.controls-container input:focus,
+.controls-container select:focus,
+.controls-container button:focus {
+  outline: none;
+  border: 2px solid #3498db;
+}
+
+.controls-container button {
+  background-color: #3498db;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.controls-container button:hover {
+  background-color: #2980b9;
+}
+
+.filter-search-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  align-items: center;
+}
+
+/* Assign User Form */
+.assign-ticket-container {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* User Table */
+.ticket-list-container {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.ticket-list-container h3 {
+  font-size: 22px;
+  margin-bottom: 15px;
+  color: #2c3e50;
+}
+
+.ticket-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.ticket-table th {
+  background-color: #1e2a38;
+  color: #ecf0f1;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 12px;
+  text-align: left;
+}
+
+.ticket-table td {
+  padding: 12px;
+  font-size: 14px;
+  background-color: #fff;
+  border-bottom: 1px solid #ddd;
+  color: #333;
+}
+
+.ticket-table tr:hover {
+  background-color: #eaf4ff;
+}
+
+.ticket-table td button {
+  background-color: #3498db;
+  border: none;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.ticket-table td button:hover {
+  background-color: #2980b9;
+}
+
+/* Status Label */
+.status-label {
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  text-transform: uppercase;
+}
+
+.status-label.admin {
+  color: #d35400;
+}
+
+.status-label.user {
+  color: #3498db;
+}
+
+.status-label.housekeeper {
+  color: #16a085;
+}
+
+.status-label.supervisor {
+  color: #8e44ad;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .dashboard-container {
+    margin-left: 0;
+    padding: 15px;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .admin-header-buttons {
+    position: static;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+  }
+
+  .controls-container,
+  .assign-ticket-container,
+  .filter-search-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ticket-table th,
+  .ticket-table td {
+    font-size: 12px;
+    padding: 8px;
+  }
+}
