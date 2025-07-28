@@ -3,6 +3,12 @@
   display: flex;
 }
 
+.dashboard-container {
+  margin-top: -100px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 /* Sidebar */
 .sidebar {
   width: 240px;
@@ -88,26 +94,25 @@
   background-color: #d32f2f;
 }
 
-/* Content Layout */
-.dashboard-container {
-  margin-left: 260px;
-  padding: 30px;
-  background-color: #f3f4f6;
-  min-height: 100vh;
-  color: #333;
-}
-
-/* Controls */
 .controls-container {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
   background-color: #34495e;
   padding: 20px;
   border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
   color: white;
   margin-bottom: 20px;
 }
+
+
+.controls-container {
+  width: 100%;
+  box-sizing: border-box;
+}
+
 
 .controls-container input,
 .controls-container select,
@@ -146,13 +151,15 @@
   flex-wrap: wrap;
   gap: 15px;
   align-items: center;
+  order: 2;
+  width: 100%; /* 🔥 important for full width */
 }
-
-/* Assign User Form */
 .assign-ticket-container {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  order: 1;
+  width: 100%; 
 }
 
 /* User Table */
@@ -236,11 +243,19 @@
   color: #8e44ad;
 }
 
+.logo {
+  width: 60px;
+  height: auto;
+  object-fit: contain;
+  margin-bottom: 20px;
+}
+
+
 /* Responsive */
 @media (max-width: 768px) {
-  .dashboard-container {
-    margin-left: 0;
-    padding: 15px;
+  .controls-container {
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .sidebar {
@@ -266,3 +281,4 @@
     padding: 8px;
   }
 }
+

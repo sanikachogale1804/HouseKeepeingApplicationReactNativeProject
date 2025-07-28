@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import UpdateUserForm from './UpdateUserForm';
-import '../CSS/AdminPanel.css'; // assuming the CSS you gave is saved here
+import '../CSS/AdminPanel.css';
+import logo from '../Images/logo.png';
 
 function AdminPanel() {
   const [users, setUsers] = useState([]);
@@ -64,7 +65,7 @@ function AdminPanel() {
       {/* Sidebar */}
       <div className="sidebar">
         <div className="sidebar-logo">
-          <img src="" alt="Logo" className="logo" />
+          <img src={logo} alt="Logo" className="logo" />
         </div>
         <div className="admin-title">Admin Panel</div>
         <ul className="sidebar-links">
@@ -76,8 +77,8 @@ function AdminPanel() {
       {/* Main Panel */}
       <div className="dashboard-container" style={{ marginLeft: '260px', padding: '20px' }}>
         <div className="admin-header-buttons">
-          <button className="home-button-admin">Home</button>
-          <button className="logout-button-admin">Logout</button>
+          {/* <button className="home-button-admin">Home</button>
+          <button className="logout-button-admin">Logout</button> */}
         </div>
 
         <div className="controls-container">

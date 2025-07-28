@@ -6,6 +6,7 @@ import LoginScreen from './screens/LoginScreen';
 import FloorDataScreen from './screens/FloorDataScreen';
 import { ActivityIndicator, View } from 'react-native';
 
+
 export type RootStackParamList = {
   Login: undefined;
   FloorData: { user: any }; // Use specific type if available
