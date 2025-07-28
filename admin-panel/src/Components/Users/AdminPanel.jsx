@@ -3,6 +3,7 @@ import axios from 'axios';
 import UpdateUserForm from './UpdateUserForm';
 import '../CSS/AdminPanel.css';
 import logo from '../Images/logo.png';
+import { Link } from 'react-router-dom'; // Add this at the top
 
 function AdminPanel() {
   const [users, setUsers] = useState([]);
@@ -69,16 +70,14 @@ function AdminPanel() {
         </div>
         <div className="admin-title">Admin Panel</div>
         <ul className="sidebar-links">
-          <li><a className="sidebar-link" href="/">Dashboard</a></li>
-          <li><a className="sidebar-link" href="/admin">User Management</a></li>
+          <li><Link className="sidebar-link" to="/dashboard">Dashboard</Link></li>
+          <li><Link className="sidebar-link" to="/admin">User Management</Link></li>
         </ul>
       </div>
 
       {/* Main Panel */}
       <div className="dashboard-container" style={{ marginLeft: '260px', padding: '20px' }}>
         <div className="admin-header-buttons">
-          {/* <button className="home-button-admin">Home</button>
-          <button className="logout-button-admin">Logout</button> */}
         </div>
 
         <div className="controls-container">
