@@ -1,0 +1,135 @@
+/* Container Layout */
+.dashboard-wrapper {
+  display: flex;
+  flex-direction: row;
+  min-height: 100vh;
+}
+
+/* Main dashboard content */
+.dashboard-main {
+  margin-left: 260px;
+  padding: 20px;
+  flex: 1;
+  background-color: #f3f4f6;
+  box-sizing: border-box;
+}
+
+/* Title */
+.dashboard-main h2 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+/* Controls Section */
+.dashboard-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  background-color: #34495e;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  color: white;
+}
+
+.dashboard-controls select,
+.dashboard-controls button {
+  padding: 10px 14px;
+  font-size: 14px;
+  border-radius: 5px;
+  border: none;
+  background-color: #1e2a38;
+  color: white;
+  transition: border 0.2s, background-color 0.3s;
+}
+
+.dashboard-controls select:focus,
+.dashboard-controls button:focus {
+  outline: none;
+  border: 2px solid #3498db;
+}
+
+.dashboard-controls button {
+  background-color: #3498db;
+  cursor: pointer;
+}
+
+.dashboard-controls button:hover {
+  background-color: #2980b9;
+}
+
+/* Image List Section */
+.dashboard-image-section {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.dashboard-image-section h3 {
+  font-size: 20px;
+  color: #2c3e50;
+  margin-bottom: 15px;
+}
+
+.floor-image-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #ddd;
+  padding: 10px 0;
+}
+
+.floor-name {
+  min-width: 140px;
+  font-weight: bold;
+  color: #34495e;
+}
+
+.floor-thumbnail {
+  width: 100px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.floor-thumbnail:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Modal Preview */
+.image-preview-modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.image-preview-modal img {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 8px;
+  box-shadow: 0 0 20px black;
+}
+
+/* Responsive Behavior */
+@media (max-width: 768px) {
+  .dashboard-main {
+    margin-left: 0;
+  }
+
+  .dashboard-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .floor-name {
+    min-width: 100px;
+  }
+}

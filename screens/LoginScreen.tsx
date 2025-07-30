@@ -53,14 +53,16 @@ const LoginScreen: React.FC = () => {
       console.log('🌐 API URL:', url);
 
       const response = await fetch(url);
-      const responseBody = await response.text();
+      const responseBody = await response.text(); // BACK TO TEXT
 
       console.log('🧾 Response Body:', responseBody);
       console.log('📡 HTTP Status:', response.status);
 
       if (response.ok) {
-        if (!responseBody || responseBody.length < 10) {
-          throw new Error('Token missing in response');
+        // ⛔ Allow only housekeeper username (OR change to match your role logic)
+        if (username.toLowerCase() !== 'housekeeper') {
+          Alert.alert('🚫 Access Denied', 'Only housekeeper role is allowed to log in.');
+          return;
         }
 
         // ✅ Save token and credentials

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import logo from '../Images/logo.png';
 import { Link } from 'react-router-dom';
 import '../CSS/AdminPanel.css';
+import '../CSS/Dashboard.css'; // NEW DASHBOARD-SPECIFIC STYLES
 
 function Dashboard() {
   const [selectedSubfloor, setSelectedSubfloor] = useState('');
@@ -15,8 +16,7 @@ function Dashboard() {
   ];
 
   const getSuffix = (n) => {
-    const j = n % 10,
-      k = n % 100;
+    const j = n % 10, k = n % 100;
     if (j === 1 && k !== 11) return `${n}st`;
     if (j === 2 && k !== 12) return `${n}nd`;
     if (j === 3 && k !== 13) return `${n}rd`;
@@ -40,14 +40,12 @@ function Dashboard() {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-
       if (!token) {
         alert('User not authenticated. Please login.');
         return;
       }
 
       const encodedSubfloor = encodeURIComponent(selectedSubfloor);
-
       const response = await fetch(
         `http://localhost:5005/floorData/images?subFloorName=${encodedSubfloor}`,
         {
@@ -88,11 +86,11 @@ function Dashboard() {
         </ul>
       </div>
 
-      {/* Main */}
-      <div className="dashboard-container" style={{ marginLeft: '260px', padding: '20px' }}>
+      {/* Main Dashboard Content */}
+      <div className="dashboard-main">
         <h2>Fetch Images by Subfloor</h2>
 
-        <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+        <div className="dashboard-controls">
           <select onChange={(e) => setSelectedSubfloor(e.target.value)} value={selectedSubfloor}>
             <option disabled value="">-- Select Subfloor --</option>
             {subfloors.map((sub, i) => (
@@ -105,10 +103,9 @@ function Dashboard() {
           </button>
         </div>
 
-        {/* Floor list with thumbnails */}
-        <div style={{ marginTop: '30px' }}>
-          <h3>Floor List with Images ({selectedSubfloor})</h3>
-          <ul style={{ listStyleType: 'none', padding: 0 }}>
+        <div className="dashboard-image-section">
+          <h3>Floor List with Images ({selectedSubfloor || 'None'})</h3>
+          <ul className="dashboard-floor-list">
             {floorOptionsEn.map((floor, index) => {
               const floorImages = images.filter(
                 (img) =>
@@ -117,61 +114,35 @@ function Dashboard() {
               );
 
               return (
-                <li key={index} style={{ marginBottom: '20px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                    <div style={{ fontWeight: 'bold', minWidth: '120px' }}>{floor}</div>
+                <li key={index}>
+                  <div className="floor-image-group">
+                    <div className="floor-name">{floor}</div>
                     {floorImages.length > 0 ? (
                       floorImages.map((img) => (
                         <img
                           key={img.id}
                           src={`http://localhost:5005/floorData/${img.id}/image`}
                           alt={img.taskImage}
-                          width="100"
-                          style={{
-                            cursor: 'pointer',
-                            border: '1px solid #ccc',
-                            borderRadius: '4px',
-                          }}
+                          className="floor-thumbnail"
                           onClick={() =>
                             setPreviewImage(`http://localhost:5005/floorData/${img.id}/image`)
                           }
                         />
                       ))
                     ) : (
-                      <div style={{ color: 'gray' }}>No images</div>
+                      <div className="no-image">No images</div>
                     )}
                   </div>
                 </li>
-
               );
             })}
           </ul>
         </div>
 
-        {/* Modal popup for preview */}
+        {/* Modal Preview */}
         {previewImage && (
-          <div
-            onClick={() => setPreviewImage(null)}
-            style={{
-              position: 'fixed',
-              top: 0, left: 0, right: 0, bottom: 0,
-              backgroundColor: 'rgba(0, 0, 0, 0.7)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 1000,
-            }}
-          >
-            <img
-              src={previewImage}
-              alt="Full View"
-              style={{
-                maxWidth: '90%',
-                maxHeight: '90%',
-                borderRadius: '8px',
-                boxShadow: '0 0 20px black'
-              }}
-            />
+          <div className="image-preview-modal" onClick={() => setPreviewImage(null)}>
+            <img src={previewImage} alt="Full View" />
           </div>
         )}
       </div>

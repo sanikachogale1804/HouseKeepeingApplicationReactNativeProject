@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import  { jwtDecode } from 'jwt-decode'; // ✅ Correct import (note: no curly braces)
 
 function LoginForm() {
   const [username, setUsername] = useState('');
@@ -6,20 +7,27 @@ function LoginForm() {
 
   const handleLogin = async () => {
     try {
-      // 👇 Update with your backend IP if not using localhost
-      const baseUrl = 'http://localhost:5005';
+      const baseUrl = 'http://192.168.1.92:5005';
       const url = `${baseUrl}/login?username=${encodeURIComponent(username)}&userPassword=${encodeURIComponent(userPassword)}`;
 
-      const response = await fetch(url); // GET request, like React Native version
-      const token = await response.text(); // Receive raw token (not JSON)
-
-      console.log('🔑 Token:', token);
+      const response = await fetch(url);
+      const token = await response.text();
 
       if (response.ok && token && token.length > 10) {
-        localStorage.setItem('token', token);
-        alert('✅ Login successful!');
-        // Optional: redirect or reload
-        window.location.href = '/image-fetcher'; // Or any page you want to show
+        // ✅ Decode the JWT
+        const decoded = jwtDecode(token);
+        console.log('🧠 Decoded Token:', decoded);
+
+        // ✅ Ensure backend sends `role` inside token
+        const role = decoded.role;
+
+        if (role === 'admin') {
+          localStorage.setItem('token', token);
+          alert('✅ Login successful!');
+          window.location.href = '/image-fetcher';
+        } else {
+          alert(`❌ Access Denied. Only 'admin' role is allowed. Your role: ${role}`);
+        }
       } else {
         alert('❌ Login failed: Invalid credentials');
       }
@@ -39,7 +47,6 @@ function LoginForm() {
         value={username}
         style={{ padding: 8, width: '100%', marginBottom: 12 }}
       />
-      <br />
 
       <input
         placeholder="Password"
@@ -48,7 +55,6 @@ function LoginForm() {
         value={userPassword}
         style={{ padding: 8, width: '100%', marginBottom: 12 }}
       />
-      <br />
 
       <button onClick={handleLogin} style={{ padding: '10px 20px' }}>
         Login
