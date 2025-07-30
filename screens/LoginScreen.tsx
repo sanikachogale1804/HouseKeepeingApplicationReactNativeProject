@@ -59,11 +59,27 @@ const LoginScreen: React.FC = () => {
       console.log('📡 HTTP Status:', response.status);
 
       if (response.ok) {
-        // ⛔ Allow only housekeeper username (OR change to match your role logic)
-        if (username.toLowerCase() !== 'housekeeper') {
-          Alert.alert('🚫 Access Denied', 'Only housekeeper role is allowed to log in.');
+        if (!responseBody || responseBody.length < 10) {
+          throw new Error('Token missing in response');
+        }
+
+        // 🧠 Decode token to verify role
+        const tokenParts = responseBody.split('.');
+        if (tokenParts.length !== 3) {
+          throw new Error('Invalid token format');
+        }
+        const payload = JSON.parse(atob(tokenParts[1]));
+        console.log('🔍 Decoded JWT Payload:', payload);
+
+        // Adjust this check based on actual structure
+        const role = payload.role || payload.roles?.[0] || payload.authorities?.[0];
+        console.log('👤 Extracted Role:', role);
+
+        if (!role || !role.toLowerCase().includes('housekeeper')) {
+          Alert.alert('⛔ Access Denied', 'Only housekeepers can log in.');
           return;
         }
+
 
         // ✅ Save token and credentials
         await AsyncStorage.setItem('access_token', responseBody);
@@ -72,6 +88,7 @@ const LoginScreen: React.FC = () => {
 
         Alert.alert('✅ Success', 'Login successful');
         navigation.navigate('FloorData', { user: { username } });
+
       } else {
         Alert.alert('❌ Login Failed', responseBody || 'Invalid credentials');
       }
