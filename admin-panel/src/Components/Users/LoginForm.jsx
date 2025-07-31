@@ -5,30 +5,39 @@ function LoginForm() {
   const [username, setUsername] = useState('');
   const [userPassword, setUserPassword] = useState('');
 
-  const handleLogin = async () => {
-    try {
-       const baseUrl = 'http://localhost:5005';
-      const url = `${baseUrl}/login?username=${encodeURIComponent(username)}&userPassword=${encodeURIComponent(userPassword)}`;
+const handleLogin = async () => {
+  try {
+    const baseUrl = 'http://localhost:5005';
+    const url = `${baseUrl}/login?username=${encodeURIComponent(username)}&userPassword=${encodeURIComponent(userPassword)}`;
 
-      const response = await fetch(url); // GET request, like React Native version
-      const token = await response.text(); // Receive raw token (not JSON)
+    const response = await fetch(url); // GET request
+    const token = await response.text(); // Raw token
 
-      console.log('🔑 Token:', token);
+    if (response.ok && token && token.length > 10) {
+      // ✅ Decode the token
+      const decoded = jwtDecode(token);
 
-      if (response.ok && token && token.length > 10) {
-        // ✅ Decode the JWT
-         localStorage.setItem('token', token);
-        alert('✅ Login successful!');
-        // Optional: redirect or reload
-        window.location.href = '/image-fetcher'; // Or any page you want to show
-      } else {
-        alert('❌ Login failed: Invalid credentials');
+      // 🔐 Extract role
+      const role = decoded.role || decoded.roles?.[0] || decoded.authorities?.[0];
+
+
+      // 🚫 Only allow admin
+      if (!role || role.toLowerCase() !== 'admin') {
+        alert('⛔ Access Denied: Only admin can log in');
+        return;
       }
-    } catch (err) {
-      console.error('Login error:', err);
-      alert('⚠️ Could not connect to server');
+
+      // ✅ Store and proceed
+      localStorage.setItem('token', token);
+      alert('✅ Login successful!');
+      window.location.href = '/admin';
+    } else {
+      alert('❌ Login failed: Invalid credentials');
     }
-  };
+  } catch (err) {
+    alert('⚠️ Could not connect to server');
+  }
+};
 
   return (
     <div style={{ padding: 20, fontFamily: 'Arial' }}>

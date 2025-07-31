@@ -41,7 +41,6 @@ const LoginScreen: React.FC = () => {
   }, []);
 
   const handleLogin = async () => {
-    console.log('📲 Login button clicked');
 
     try {
       const localhostIP = 'http://10.0.2.2:5005';
@@ -50,13 +49,10 @@ const LoginScreen: React.FC = () => {
 
       const baseUrl = __DEV__ ? localNetworkIP : publicIP;
       const url = `${baseUrl}/login?username=${username}&userPassword=${password}`;
-      console.log('🌐 API URL:', url);
 
       const response = await fetch(url);
       const responseBody = await response.text(); // BACK TO TEXT
 
-      console.log('🧾 Response Body:', responseBody);
-      console.log('📡 HTTP Status:', response.status);
 
       if (response.ok) {
         if (!responseBody || responseBody.length < 10) {
@@ -69,11 +65,9 @@ const LoginScreen: React.FC = () => {
           throw new Error('Invalid token format');
         }
         const payload = JSON.parse(atob(tokenParts[1]));
-        console.log('🔍 Decoded JWT Payload:', payload);
 
         // Adjust this check based on actual structure
         const role = payload.role || payload.roles?.[0] || payload.authorities?.[0];
-        console.log('👤 Extracted Role:', role);
 
         if (!role || !role.toLowerCase().includes('housekeeper')) {
           Alert.alert('⛔ Access Denied', 'Only housekeepers can log in.');

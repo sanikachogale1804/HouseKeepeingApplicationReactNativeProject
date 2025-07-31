@@ -56,10 +56,11 @@ function AdminPanel() {
     fetchUsers();
   };
 
-  const filteredUsers = users.filter(user =>
-    user.username.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    (selectedRole === '' || user.role === selectedRole)
-  );
+ const filteredUsers = users.filter(user =>
+  user.username.toLowerCase().includes(searchTerm.toLowerCase()) &&
+  (selectedRole === '' || user.role.toLowerCase() === selectedRole.toLowerCase())
+);
+
 
   return (
     <div className="admin-container">
