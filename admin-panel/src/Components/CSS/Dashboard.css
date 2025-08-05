@@ -146,6 +146,13 @@
   border-radius: 8px;
 }
 
+.datepicker {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-left: 10px;
+}
+
 
 /* Responsive Behavior */
 @media (max-width: 768px) {

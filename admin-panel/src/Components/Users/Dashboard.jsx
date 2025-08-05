@@ -1,14 +1,19 @@
 import React, { useState } from 'react';
 import logo from '../Images/logo.png';
 import { Link } from 'react-router-dom';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+
 import '../CSS/AdminPanel.css';
 import '../CSS/Dashboard.css';
 
 function Dashboard() {
   const [selectedSubfloor, setSelectedSubfloor] = useState('');
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
+
 
   const subfloors = [
     'East Lobby Area', 'West Lobby Area', 'Washroom', 'Common Area',
@@ -63,6 +68,7 @@ function Dashboard() {
       }
 
       const data = await response.json();
+      console.log('Fetched images:', data);
       setImages(data);
     } catch (error) {
       console.error('Error fetching images:', error);
@@ -71,6 +77,34 @@ function Dashboard() {
       setLoading(false);
     }
   };
+
+  // Format: yyyy-mm-dd from selected date
+  const formatDate = (date) => {
+    return date.toISOString().split('T')[0];
+  };
+  const filteredImages = selectedDate
+    ? images.filter((img) => {
+      if (!img.taskImage) return false;
+
+      const match = img.taskImage.match(/\d{4}-\d{2}-\d{2}/);
+      if (!match) return false;
+
+      const imageDate = match[0];
+
+      const selected =
+        selectedDate.getFullYear() +
+        '-' +
+        String(selectedDate.getMonth() + 1).padStart(2, '0') +
+        '-' +
+        String(selectedDate.getDate()).padStart(2, '0');
+
+      console.log('Comparing imageDate:', imageDate, 'with selectedDate:', selected);
+
+      return imageDate === selected;
+    })
+    : images;
+
+
 
   return (
     <div className="admin-container">
@@ -88,7 +122,7 @@ function Dashboard() {
 
       {/* Main Dashboard Content */}
       <div className="dashboard-main">
-        <h2>Fetch Images by Subfloor</h2>
+        <h2>Fetch Images by Subfloor and Date</h2>
 
         <div className="dashboard-controls">
           <select onChange={(e) => setSelectedSubfloor(e.target.value)} value={selectedSubfloor}>
@@ -98,16 +132,27 @@ function Dashboard() {
             ))}
           </select>
 
+          <DatePicker
+            selected={selectedDate}
+            onChange={(date) => setSelectedDate(date)}
+            placeholderText="Select a date"
+            dateFormat="yyyy-MM-dd"
+            className="datepicker"
+          />
+
           <button onClick={fetchImages} disabled={loading}>
             {loading ? 'Loading...' : 'Fetch Images'}
           </button>
         </div>
 
         <div className="dashboard-image-section">
-          <h3>Floor List with Images ({selectedSubfloor || 'None'})</h3>
+          <h3>
+            Floor List with Images ({selectedSubfloor || 'None'})
+            {selectedDate && ` on ${formatDate(selectedDate)}`}
+          </h3>
           <ul className="dashboard-floor-list">
             {floorOptionsEn.map((floor, index) => {
-              const floorImages = images.filter(
+              const floorImages = filteredImages.filter(
                 (img) =>
                   img.floorName === floor &&
                   img.subFloorName === selectedSubfloor

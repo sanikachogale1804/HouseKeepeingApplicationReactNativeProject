@@ -4,6 +4,7 @@ import AdminPanel from './Components/Users/AdminPanel';
 import Dashboard from './Components/Users/Dashboard';
 import ImageFetcher from './Components/Users/ImageFetcher';
 import LoginForm from './Components/Users/LoginForm';
+import ImageCalendar from './Components/Users/ImageCalendar';
 
 const App = () => {
   return (
@@ -13,6 +14,7 @@ const App = () => {
         <Route path="/image-fetcher" element={<ImageFetcher />} />
         <Route path="/admin" element={<AdminPanel />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/imageCalendar" element={<ImageCalendar />} />
       </Routes>
     </Router>
   );
