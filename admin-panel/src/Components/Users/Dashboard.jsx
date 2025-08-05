@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import logo from '../Images/logo.png';
 import { Link } from 'react-router-dom';
 import '../CSS/AdminPanel.css';
-import '../CSS/Dashboard.css'; // NEW DASHBOARD-SPECIFIC STYLES
+import '../CSS/Dashboard.css';
 
 function Dashboard() {
   const [selectedSubfloor, setSelectedSubfloor] = useState('');
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [previewImage, setPreviewImage] = useState(null); // for modal
+  const [previewImage, setPreviewImage] = useState(null);
 
   const subfloors = [
     'East Lobby Area', 'West Lobby Area', 'Washroom', 'Common Area',
@@ -118,17 +118,21 @@ function Dashboard() {
                   <div className="floor-image-group">
                     <div className="floor-name">{floor}</div>
                     {floorImages.length > 0 ? (
-                      floorImages.map((img) => (
-                        <img
-                          key={img.id}
-                          src={`http://localhost:5005/floorData/${img.id}/image`}
-                          alt={img.taskImage}
-                          className="floor-thumbnail"
-                          onClick={() =>
-                            setPreviewImage(`http://localhost:5005/floorData/${img.id}/image`)
-                          }
-                        />
-                      ))
+                      <div className="floor-image-row">
+                        {floorImages.map((img) => (
+                          <div key={img.id} className="image-item">
+                            <img
+                              src={`http://localhost:5005/floorData/${img.id}/image`}
+                              alt={img.taskImage}
+                              className="floor-thumbnail"
+                              onClick={() =>
+                                setPreviewImage(`http://localhost:5005/floorData/${img.id}/image`)
+                              }
+                            />
+                            <span className="image-label">{img.taskImage}</span>
+                          </div>
+                        ))}
+                      </div>
                     ) : (
                       <div className="no-image">No images</div>
                     )}

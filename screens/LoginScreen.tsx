@@ -104,16 +104,19 @@ const LoginScreen: React.FC = () => {
 
         <TextInput
           placeholder="Username"
+          placeholderTextColor="#888" // 👈 ensure visible in dark mode
           value={username}
           onChangeText={setUsername}
-          style={styles.input}
+          style={[styles.input, { color: '#000' }]} // 👈 ensure typed text is black
           autoCapitalize="none"
         />
+
         <TextInput
           placeholder="Password"
+          placeholderTextColor="#888" // 👈 ensure visible in dark mode
           value={password}
           onChangeText={setPassword}
-          style={styles.input}
+          style={[styles.input, { color: '#000' }]} // 👈 ensure typed text is black
           secureTextEntry
         />
 
