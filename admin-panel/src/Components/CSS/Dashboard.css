@@ -152,6 +152,73 @@
   border-radius: 4px;
   margin-left: 10px;
 }
+.floor-image-table {
+  width: 100%;
+  /* border-collapse: collapse; */
+  margin-top: 20px;
+  border: 1px solid #bbb;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.floor-image-table th,
+.floor-image-table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  vertical-align: top;
+  
+}
+/* Table Header Styling */
+.floor-image-table th {
+  background-color: #34495e; /* Dark header */
+  color: white;
+  text-align: left;
+}
+
+/* Alternating Row Colors */
+.floor-image-table tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.floor-image-table tbody tr:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+/* Hover Effect */
+.floor-image-table tbody tr:hover {
+  background-color: #d6eaf8;
+  transition: background-color 0.3s ease;
+}
+
+.floor-image-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.image-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.floor-thumbnail {
+  width: 100px;
+  height: auto;
+  cursor: pointer;
+  border: 1px solid #999;
+  border-radius: 4px;
+}
+
+.image-label {
+  font-size: 12px;
+  margin-top: 5px;
+  word-break: break-all;
+}
+
+.no-image {
+  color: #777;
+  font-style: italic;
+}
 
 
 /* Responsive Behavior */

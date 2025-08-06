@@ -82,6 +82,7 @@ function Dashboard() {
   const formatDate = (date) => {
     return date.toISOString().split('T')[0];
   };
+
   const filteredImages = selectedDate
     ? images.filter((img) => {
       if (!img.taskImage) return false;
@@ -104,8 +105,6 @@ function Dashboard() {
     })
     : images;
 
-
-
   return (
     <div className="admin-container">
       {/* Sidebar */}
@@ -117,6 +116,8 @@ function Dashboard() {
         <ul className="sidebar-links">
           <li><Link className="sidebar-link" to="/dashboard">Dashboard</Link></li>
           <li><Link className="sidebar-link" to="/admin">User Management</Link></li>
+          <li><Link className="sidebar-link" to="/report">Report</Link></li>
+
         </ul>
       </div>
 
@@ -141,7 +142,7 @@ function Dashboard() {
           />
 
           <button onClick={fetchImages} disabled={loading}>
-            {loading ? 'Loading...' : 'Fetch Images'}
+            {loading ? 'Loading...' : 'Search Image'}
           </button>
         </div>
 
@@ -150,42 +151,51 @@ function Dashboard() {
             Floor List with Images ({selectedSubfloor || 'None'})
             {selectedDate && ` on ${formatDate(selectedDate)}`}
           </h3>
-          <ul className="dashboard-floor-list">
-            {floorOptionsEn.map((floor, index) => {
-              const floorImages = filteredImages.filter(
-                (img) =>
-                  img.floorName === floor &&
-                  img.subFloorName === selectedSubfloor
-              );
+          <table className="floor-image-table">
+            <thead>
+              <tr>
+                <th>Floor Name</th>
+                <th>Images</th>
+              </tr>
+            </thead>
+            <tbody>
+              {floorOptionsEn.map((floor, index) => {
+                const floorImages = filteredImages.filter(
+                  (img) =>
+                    img.floorName === floor &&
+                    img.subFloorName === selectedSubfloor
+                );
 
-              return (
-                <li key={index}>
-                  <div className="floor-image-group">
-                    <div className="floor-name">{floor}</div>
-                    {floorImages.length > 0 ? (
-                      <div className="floor-image-row">
-                        {floorImages.map((img) => (
-                          <div key={img.id} className="image-item">
-                            <img
-                              src={`http://localhost:5005/floorData/${img.id}/image`}
-                              alt={img.taskImage}
-                              className="floor-thumbnail"
-                              onClick={() =>
-                                setPreviewImage(`http://localhost:5005/floorData/${img.id}/image`)
-                              }
-                            />
-                            <span className="image-label">{img.taskImage}</span>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="no-image">No images</div>
-                    )}
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
+                return (
+                  <tr key={index}>
+                    <td>{floor}</td>
+                    <td>
+                      {floorImages.length > 0 ? (
+                        <div className="floor-image-row">
+                          {floorImages.map((img) => (
+                            <div key={img.id} className="image-item">
+                              <img
+                                src={`http://localhost:5005/floorData/${img.id}/image`}
+                                alt={img.taskImage}
+                                className="floor-thumbnail"
+                                onClick={() =>
+                                  setPreviewImage(`http://localhost:5005/floorData/${img.id}/image`)
+                                }
+                              />
+                              <span className="image-label">{img.taskImage}</span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="no-image">No images</span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+
         </div>
 
         {/* Modal Preview */}
