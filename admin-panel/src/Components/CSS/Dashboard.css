@@ -154,72 +154,88 @@
 }
 .floor-image-table {
   width: 100%;
-  /* border-collapse: collapse; */
+  border-collapse: collapse;
   margin-top: 20px;
-  border: 1px solid #bbb;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  font-family: Arial, sans-serif;
 }
 
 .floor-image-table th,
 .floor-image-table td {
   border: 1px solid #ccc;
-  padding: 10px;
-  vertical-align: top;
-  
-}
-/* Table Header Styling */
-.floor-image-table th {
-  background-color: #34495e; /* Dark header */
-  color: white;
+  padding: 12px;
   text-align: left;
+  vertical-align: top;
 }
 
-/* Alternating Row Colors */
+.floor-image-table th {
+  background-color: #2c3e50;
+  color: white;
+}
+
 .floor-image-table tbody tr:nth-child(even) {
   background-color: #f2f2f2;
 }
 
-.floor-image-table tbody tr:nth-child(odd) {
-  background-color: #ffffff;
-}
-
-/* Hover Effect */
 .floor-image-table tbody tr:hover {
-  background-color: #d6eaf8;
-  transition: background-color 0.3s ease;
+  background-color: #e6f7ff;
 }
 
-.floor-image-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+/* ✅ Line between Floor Name and Images */
+.floor-image-table td:first-child {
+  border-right: 2px solid #aaa;
 }
 
-.image-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.floor-thumbnail {
-  width: 100px;
-  height: auto;
-  cursor: pointer;
-  border: 1px solid #999;
-  border-radius: 4px;
-}
-
-.image-label {
-  font-size: 12px;
-  margin-top: 5px;
-  word-break: break-all;
-}
-
+/* Optional: Style the "No images" text */
 .no-image {
-  color: #777;
+  color: #888;
   font-style: italic;
 }
 
+/* Optional: Image preview hover effect */
+.floor-thumbnail {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.floor-thumbnail:hover {
+  transform: scale(1.1);
+  border-color: #2980b9;
+}
+
+/* Image label below thumbnail */
+.image-label {
+  display: block;
+  margin-top: 5px;
+  font-size: 12px;
+  color: #555;
+  text-align: center;
+}
+
+/* Modal preview styling */
+.image-preview-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.image-preview-modal img {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 8px;
+  box-shadow: 0 0 20px #fff;
+}
 
 /* Responsive Behavior */
 @media (max-width: 768px) {
