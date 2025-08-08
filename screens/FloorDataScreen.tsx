@@ -6,16 +6,14 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
-  Button,
-  Platform,
   ScrollView,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { launchCamera } from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image as RNImage } from 'react-native-compressor';
-import RNFS from 'react-native-fs'; 
-
+import RNFS from 'react-native-fs';
+import { useColorScheme } from 'react-native';
 
 const getSuffix = (n: number) => {
   if (n === 1) return '1st';
@@ -87,6 +85,10 @@ const FloorDataScreen = () => {
   const [imageType, setImageType] = useState('BEFORE');
   const [image, setImage] = useState<any>(null);
 
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === 'dark';
+  const styles = createStyles(isDarkMode);
+
   const t = translations[language];
   const floorLabels = language === 'mr' ? floorOptionsMr : floorOptionsEn;
   const subFloorLabels = language === 'mr' ? subFloorOptionsMr : subFloorOptionsEn;
@@ -100,7 +102,6 @@ const FloorDataScreen = () => {
 
   const handleSubmit = async () => {
     try {
-      const localhostIP = 'http://10.0.2.2:5005';
       const lanIP = 'http://192.168.1.92:5005';
       const publicIP = 'http://45.115.186.228:5005';
       const baseUrl = __DEV__ ? lanIP : publicIP;
@@ -120,7 +121,6 @@ const FloorDataScreen = () => {
       const token = await AsyncStorage.getItem('access_token');
       if (!token) throw new Error('No access token found');
 
-      // Inside handleSubmit...
       if (image && floorDataId) {
         const sanitize = (str: string) =>
           str.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
@@ -132,7 +132,6 @@ const FloorDataScreen = () => {
           now.getDate()
         )}-${pad(now.getHours())}-${pad(now.getMinutes())}.jpg`;
 
-        // 🔽 Compress until size < 512KB
         let quality = 0.8;
         let compressedImageUri = image.uri;
         let fileSizeKB = Number.MAX_VALUE;
@@ -170,7 +169,6 @@ const FloorDataScreen = () => {
           throw new Error('Image upload failed: ' + (await uploadRes.text()));
       }
 
-
       Alert.alert(t.success, t.successMsg);
       setFloorName(floorOptionsEn[0]);
       setSubFloorName(subFloorOptionsEn[0]);
@@ -202,7 +200,6 @@ const FloorDataScreen = () => {
         <Picker selectedValue={floorName} onValueChange={setFloorName} style={styles.input}>
           {floorOptionsEn.map((value, idx) => (
             <Picker.Item key={`floor-${idx}`} label={floorLabels[idx]} value={value} />
-
           ))}
         </Picker>
 
@@ -210,7 +207,6 @@ const FloorDataScreen = () => {
         <Picker selectedValue={subFloorName} onValueChange={setSubFloorName} style={styles.input}>
           {subFloorOptionsEn.map((value, idx) => (
             <Picker.Item key={`subfloor-${idx}`} label={subFloorLabels[idx]} value={value} />
-
           ))}
         </Picker>
 
@@ -234,85 +230,88 @@ const FloorDataScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flexGrow: 1,
-    backgroundColor: '#f0f4f7',
-    justifyContent: 'center',
-    padding: 24,
-  },
-  container: {
-    alignItems: 'center',
-  },
-  logo: {
-    width: 100,
-    height: 100,
-    resizeMode: 'contain',
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#333',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  label: {
-    alignSelf: 'flex-start',
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#555',
-    marginBottom: 4,
-    marginTop: 12,
-  },
-  input: {
-    width: '100%',
-    backgroundColor: '#fff',
-    borderColor: '#ccc',
-    borderWidth: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: 8,
-    marginBottom: 10,
-  },
-  loginButton: {
-    width: '100%',
-    backgroundColor: '#00695c',
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 14,
-  },
-  loginButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  previewImage: {
-    width: 200,
-    height: 200,
-    marginTop: 16,
-    borderRadius: 10,
-  },
-  languageSwitch: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 8,
-  },
-  langBtn: {
-    fontSize: 14,
-    color: '#555',
-    paddingHorizontal: 5,
-  },
-  separator: {
-    fontSize: 14,
-    color: '#555',
-    paddingHorizontal: 4,
-  },
-  activeLang: {
-    fontWeight: 'bold',
-    color: '#000',
-  },
-});
+const createStyles = (isDarkMode: boolean) =>
+  StyleSheet.create({
+    safeArea: {
+      flexGrow: 1,
+      backgroundColor: isDarkMode ? '#121212' : '#f0f4f7',
+      justifyContent: 'center',
+      padding: 24,
+    },
+    container: {
+      alignItems: 'center',
+    },
+    logo: {
+      width: 100,
+      height: 100,
+      resizeMode: 'contain',
+      marginBottom: 20,
+    },
+    title: {
+      fontSize: 22,
+      fontWeight: '700',
+      color: isDarkMode ? '#ffffff' : '#333333',
+      marginBottom: 20,
+      textAlign: 'center',
+    },
+    label: {
+      alignSelf: 'flex-start',
+      fontSize: 14,
+      fontWeight: '500',
+      color: isDarkMode ? '#cccccc' : '#555555',
+      marginBottom: 4,
+      marginTop: 12,
+    },
+    input: {
+      width: '100%',
+      backgroundColor: isDarkMode ? '#1e1e1e' : '#ffffff',
+      borderColor: isDarkMode ? '#333' : '#ccc',
+      borderWidth: 1,
+      paddingVertical: 10,
+      paddingHorizontal: 14,
+      borderRadius: 8,
+      marginBottom: 10,
+      color: isDarkMode ? '#ffffff' : '#333333',
+    },
+    loginButton: {
+      width: '100%',
+      backgroundColor: '#00695c',
+      paddingVertical: 14,
+      borderRadius: 8,
+      alignItems: 'center',
+      marginTop: 14,
+    },
+    loginButtonText: {
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    previewImage: {
+      width: 200,
+      height: 200,
+      marginTop: 16,
+      borderRadius: 10,
+      backgroundColor: isDarkMode ? '#1e1e1e' : '#ffffff',
+    },
+    languageSwitch: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      marginBottom: 8,
+    },
+    langBtn: {
+      fontSize: 14,
+      color: '#555',
+      paddingHorizontal: 5,
+    },
+    separator: {
+      fontSize: 14,
+      color: '#555',
+      paddingHorizontal: 4,
+    },
+    activeLang: {
+      fontWeight: 'bold',
+      color: '#000',
+    },
+  });
 
 export default FloorDataScreen;
