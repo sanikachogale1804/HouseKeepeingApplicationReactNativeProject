@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 import "../CSS/Report.css"; // Optional: create for external styling
 
 const Report = () => {
@@ -81,6 +83,40 @@ const Report = () => {
         return date.toLocaleString(); // returns "8/8/2025, 5:52 AM"
     };
 
+    const handleDownloadPDF = async () => {
+        const reportElement = document.querySelector(".report-table");
+        if (!reportElement) {
+            alert("No content to export.");
+            return;
+        }
+
+        const canvas = await html2canvas(reportElement, {
+            scale: 2,
+            useCORS: true,
+        });
+
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new jsPDF("p", "mm", "a4");
+
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+        const pages = Math.ceil(pdfHeight / 297); // 297mm = A4 height
+
+        for (let i = 0; i < pages; i++) {
+            if (i > 0) pdf.addPage();
+            pdf.addImage(
+                imgData,
+                "PNG",
+                0,
+                -i * 297,
+                pdfWidth,
+                (canvas.height * pdfWidth) / canvas.width
+            );
+        }
+
+        pdf.save(`Image_Report_${new Date().toISOString().split("T")[0]}.pdf`);
+    };
 
     return (
         <div className="report-container">
@@ -95,6 +131,7 @@ const Report = () => {
                     <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
                 </label>
                 <button className="fetch-button" onClick={handleFilter}>Fetch Images</button>
+                <button className="download-button" onClick={handleDownloadPDF}>Download PDF</button>
             </div>
 
             {filteredImages.length === 0 ? (
@@ -110,7 +147,7 @@ const Report = () => {
                     <tbody>
                         {Object.entries(
                             filteredImages.reduce((acc, img) => {
-                                const dateOnly = extractDateFromFilename(img.taskImage)?.split(",")[0]; // "8/8/2025"
+                                const dateOnly = extractDateFromFilename(img.taskImage)?.split(",")[0];
                                 if (!dateOnly) return acc;
                                 if (!acc[dateOnly]) acc[dateOnly] = [];
                                 acc[dateOnly].push(img);
@@ -142,7 +179,6 @@ const Report = () => {
                     </tbody>
                 </table>
             )}
-
         </div>
     );
 };
