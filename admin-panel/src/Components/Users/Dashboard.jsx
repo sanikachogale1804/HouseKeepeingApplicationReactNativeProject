@@ -7,13 +7,14 @@ import 'react-datepicker/dist/react-datepicker.css';
 import '../CSS/AdminPanel.css';
 import '../CSS/Dashboard.css';
 
+import Api_link from '../Config/apiconfig';
+
 function Dashboard() {
   const [selectedSubfloor, setSelectedSubfloor] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
-
 
   const subfloors = [
     'East Lobby Area', 'West Lobby Area', 'Washroom', 'Common Area',
@@ -52,7 +53,7 @@ function Dashboard() {
 
       const encodedSubfloor = encodeURIComponent(selectedSubfloor);
       const response = await fetch(
-        `http://localhost:5005/floorData/images?subFloorName=${encodedSubfloor}`,
+        `${Api_link}/floorData/images?subFloorName=${encodedSubfloor}`,   // ✅ dynamic
         {
           method: 'GET',
           headers: {
@@ -78,31 +79,26 @@ function Dashboard() {
     }
   };
 
-  // Format: yyyy-mm-dd from selected date
   const formatDate = (date) => {
     return date.toISOString().split('T')[0];
   };
 
   const filteredImages = selectedDate
     ? images.filter((img) => {
-      if (!img.taskImage) return false;
+        if (!img.taskImage) return false;
+        const match = img.taskImage.match(/\d{4}-\d{2}-\d{2}/);
+        if (!match) return false;
 
-      const match = img.taskImage.match(/\d{4}-\d{2}-\d{2}/);
-      if (!match) return false;
+        const imageDate = match[0];
+        const selected =
+          selectedDate.getFullYear() +
+          '-' +
+          String(selectedDate.getMonth() + 1).padStart(2, '0') +
+          '-' +
+          String(selectedDate.getDate()).padStart(2, '0');
 
-      const imageDate = match[0];
-
-      const selected =
-        selectedDate.getFullYear() +
-        '-' +
-        String(selectedDate.getMonth() + 1).padStart(2, '0') +
-        '-' +
-        String(selectedDate.getDate()).padStart(2, '0');
-
-      console.log('Comparing imageDate:', imageDate, 'with selectedDate:', selected);
-
-      return imageDate === selected;
-    })
+        return imageDate === selected;
+      })
     : images;
 
   return (
@@ -117,11 +113,10 @@ function Dashboard() {
           <li><Link className="sidebar-link" to="/dashboard">Dashboard</Link></li>
           <li><Link className="sidebar-link" to="/admin">User Management</Link></li>
           <li><Link className="sidebar-link" to="/report">Report</Link></li>
-
         </ul>
       </div>
 
-      {/* Main Dashboard Content */}
+      {/* Main Dashboard */}
       <div className="dashboard-main">
         <h2>Fetch Images by Subfloor and Date</h2>
 
@@ -175,11 +170,11 @@ function Dashboard() {
                           {floorImages.map((img) => (
                             <div key={img.id} className="image-item">
                               <img
-                                src={`http://localhost:5005/floorData/${img.id}/image`}
+                                src={`${Api_link}/floorData/${img.id}/image`}   // ✅ dynamic
                                 alt={img.taskImage}
                                 className="floor-thumbnail"
                                 onClick={() =>
-                                  setPreviewImage(`http://localhost:5005/floorData/${img.id}/image`)
+                                  setPreviewImage(`${Api_link}/floorData/${img.id}/image`) // ✅ dynamic
                                 }
                               />
                               <span className="image-label">{img.taskImage}</span>
@@ -195,10 +190,8 @@ function Dashboard() {
               })}
             </tbody>
           </table>
-
         </div>
 
-        {/* Modal Preview */}
         {previewImage && (
           <div className="image-preview-modal" onClick={() => setPreviewImage(null)}>
             <img src={previewImage} alt="Full View" />

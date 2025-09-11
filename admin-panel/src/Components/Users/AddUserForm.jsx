@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Api_link from '../Config/apiconfig';
 
 function UserForm({ onUserAdded }) {
   const [name, setName] = useState('');
@@ -15,7 +16,7 @@ function UserForm({ onUserAdded }) {
     };
 
     try {
-      const response = await fetch('http://localhost:5005/users', {
+      const response = await fetch(`${Api_link}/users`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

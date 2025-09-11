@@ -3,7 +3,8 @@ import axios from 'axios';
 import UpdateUserForm from './UpdateUserForm';
 import '../CSS/AdminPanel.css';
 import logo from '../Images/logo.png';
-import { Link } from 'react-router-dom'; // Add this at the top
+import { Link } from 'react-router-dom';
+import Api_link from '../Config/apiconfig';
 
 function AdminPanel() {
   const [users, setUsers] = useState([]);
@@ -17,7 +18,7 @@ function AdminPanel() {
   }, []);
 
   const fetchUsers = () => {
-    axios.get('http://localhost:5005/users')
+    axios.get(`${Api_link}/users`)   // ✅ dynamic URL
       .then(response => {
         const embeddedUsers = response.data._embedded?.users || [];
         setUsers(embeddedUsers);
@@ -36,7 +37,7 @@ function AdminPanel() {
 
   const handleAddUser = (e) => {
     e.preventDefault();
-    axios.post('http://localhost:5005/register', newUser)
+    axios.post(`${Api_link}/register`, newUser)  // ✅ dynamic URL
       .then(() => {
         alert("User Added Successfully!");
         setNewUser({ username: '', userPassword: '', role: '' });
@@ -56,11 +57,10 @@ function AdminPanel() {
     fetchUsers();
   };
 
- const filteredUsers = users.filter(user =>
-  user.username.toLowerCase().includes(searchTerm.toLowerCase()) &&
-  (selectedRole === '' || user.role.toLowerCase() === selectedRole.toLowerCase())
-);
-
+  const filteredUsers = users.filter(user =>
+    user.username.toLowerCase().includes(searchTerm.toLowerCase()) &&
+    (selectedRole === '' || user.role.toLowerCase() === selectedRole.toLowerCase())
+  );
 
   return (
     <div className="admin-container">
@@ -78,9 +78,6 @@ function AdminPanel() {
 
       {/* Main Panel */}
       <div className="dashboard-container" style={{ marginLeft: '260px', padding: '20px' }}>
-        <div className="admin-header-buttons">
-        </div>
-
         <div className="controls-container">
           <div className="filter-search-container">
             <input

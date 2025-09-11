@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import Api_link from '../Config/apiconfig';
 
 function UpdateUserForm({ user, onSuccess, onCancel }) {
     const [formData, setFormData] = useState({
@@ -27,7 +28,7 @@ function UpdateUserForm({ user, onSuccess, onCancel }) {
 
         const userId = extractIdFromHref(user._links.self.href);
 
-        axios.put(`http://localhost:5005/users/${userId}`, formData)
+        axios.put(`${Api_link}/users/${userId}`, formData)
             .then(() => {
                 alert("User updated successfully!");
                 onSuccess();
@@ -44,7 +45,7 @@ function UpdateUserForm({ user, onSuccess, onCancel }) {
 
         try {
             const userId = extractIdFromHref(user._links.self.href); // 💡 FIX HERE
-            await axios.delete(`http://localhost:5005/users/${userId}`);
+            await axios.delete(`${Api_link}/users/${userId}`);
             alert("User deleted successfully.");
             onSuccess(); // Refresh user list or close modal
         } catch (error) {

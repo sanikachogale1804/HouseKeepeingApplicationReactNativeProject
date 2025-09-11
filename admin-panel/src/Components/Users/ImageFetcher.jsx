@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Api_link from '../Config/apiconfig';
 
 function ImageFetcher() {
   const [selectedSubfloor, setSelectedSubfloor] = useState('');
@@ -9,6 +10,7 @@ function ImageFetcher() {
     'East Lobby Area', 'West Lobby Area', 'Washroom', 'Common Area',
     'Back Tericota', 'Marble Tericota', 'Meeting Room', 'Conference Room', 'Pantry Area',
   ];
+
 
   const handleFetchImages = async () => {
     if (!selectedSubfloor) {
@@ -27,7 +29,7 @@ function ImageFetcher() {
 
       const encodedSubfloor = encodeURIComponent(selectedSubfloor);
 
-      const response = await fetch(`http://localhost:5005/floorData/images?subFloorName=${encodedSubfloor}`, {
+      const response = await fetch(`${Api_link}/floorData/images?subFloorName=${encodedSubfloor}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -36,15 +38,11 @@ function ImageFetcher() {
       });
 
       if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error('Unauthorized. Token might be expired or invalid.');
-        } else {
-          const errorText = await response.text();
-          throw new Error(`HTTP ${response.status}: ${errorText}`);
-        }
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
       }
 
-      const data = await response.json(); 
+      const data = await response.json();
       setImages(data);
     } catch (error) {
       console.error('Error fetching images:', error);
@@ -77,7 +75,7 @@ function ImageFetcher() {
             <div key={img.id} style={{ textAlign: 'center' }}>
               <p>{img.taskImage}</p>
               <img
-                src={`http://localhost:5005/floorData/${img.id}/image`}
+                src={`${Api_link}/floorData/${img.id}/image`}  // ✅ Dynamic URL
                 alt={img.taskImage}
                 width="250"
                 style={{

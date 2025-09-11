@@ -10,7 +10,7 @@ import Report from './Components/Users/Report';
 
 const App = () => {
   return (
-    <Router>
+    <Router basename="/admin-panel">
       <Routes>
         <Route path="/" element={<LoginForm />} />
         <Route path="/image-fetcher" element={<ImageFetcher />} />
