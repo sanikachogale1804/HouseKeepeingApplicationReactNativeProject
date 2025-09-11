@@ -8,7 +8,9 @@ function LoginForm() {
 
   const handleLogin = async () => {
     try {
+      console.log("Api_link => ", Api_link);
       const url = `${Api_link}/login?username=${encodeURIComponent(username)}&userPassword=${encodeURIComponent(userPassword)}`;
+      console.log("Login URL =>", url); // check final URL
 
       const response = await fetch(url); // GET request
       const token = await response.text(); // Raw token
