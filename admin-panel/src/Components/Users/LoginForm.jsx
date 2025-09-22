@@ -31,7 +31,7 @@ function LoginForm() {
         // ✅ Store and proceed
         localStorage.setItem('token', token);
         alert('✅ Login successful!');
-        window.location.href = '/dashboard';
+        window.location.href = '/admin-panel/dashboard';
       } else {
         alert('❌ Login failed: Invalid credentials');
       }

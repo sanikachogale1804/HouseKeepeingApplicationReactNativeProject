@@ -237,6 +237,27 @@
   box-shadow: 0 0 20px #fff;
 }
 
+.dashboard-topbar {
+  display: flex;
+  justify-content: space-between; /* title left, logout right */
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.logout-btn {
+  padding: 10px 15px;
+  background-color: #e63946;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.logout-btn:hover {
+  background-color: #d62828;
+}
+
 /* Responsive Behavior */
 @media (max-width: 768px) {
   .dashboard-main {

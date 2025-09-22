@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import logo from '../Images/logo.png';
-import { Link } from 'react-router-dom';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
+import { Link, useNavigate } from 'react-router-dom';
 
 import '../CSS/AdminPanel.css';
 import '../CSS/Dashboard.css';
@@ -11,10 +9,16 @@ import Api_link from '../Config/apiconfig';
 
 function Dashboard() {
   const [selectedSubfloor, setSelectedSubfloor] = useState('');
-  const [selectedDate, setSelectedDate] = useState(new Date());
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
+
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token"); // remove token
+    navigate("/"); // redirect to login page (ya aapka login route)
+  };
 
   const subfloors = [
     'East Lobby Area', 'West Lobby Area', 'Washroom', 'Common Area',
@@ -37,11 +41,9 @@ function Dashboard() {
     ...Array.from({ length: 27 }, (_, i) => `${getSuffix(i + 1)} Floor`),
   ];
 
-  const fetchImages = async () => {
-    if (!selectedSubfloor) {
-      alert('Please select a Subfloor.');
-      return;
-    }
+  // Fetch images whenever subfloor changes
+  const fetchImages = async (subfloor) => {
+    if (!subfloor) return;
 
     try {
       setLoading(true);
@@ -51,9 +53,9 @@ function Dashboard() {
         return;
       }
 
-      const encodedSubfloor = encodeURIComponent(selectedSubfloor);
+      const encodedSubfloor = encodeURIComponent(subfloor);
       const response = await fetch(
-        `${Api_link}/floorData/images?subFloorName=${encodedSubfloor}`,   // ✅ dynamic
+        `${Api_link}/floorData/images?subFloorName=${encodedSubfloor}`,
         {
           method: 'GET',
           headers: {
@@ -79,28 +81,6 @@ function Dashboard() {
     }
   };
 
-  const formatDate = (date) => {
-    return date.toISOString().split('T')[0];
-  };
-
-  const filteredImages = selectedDate
-    ? images.filter((img) => {
-        if (!img.taskImage) return false;
-        const match = img.taskImage.match(/\d{4}-\d{2}-\d{2}/);
-        if (!match) return false;
-
-        const imageDate = match[0];
-        const selected =
-          selectedDate.getFullYear() +
-          '-' +
-          String(selectedDate.getMonth() + 1).padStart(2, '0') +
-          '-' +
-          String(selectedDate.getDate()).padStart(2, '0');
-
-        return imageDate === selected;
-      })
-    : images;
-
   return (
     <div className="admin-container">
       {/* Sidebar */}
@@ -114,38 +94,40 @@ function Dashboard() {
           <li><Link className="sidebar-link" to="/admin">User Management</Link></li>
           <li><Link className="sidebar-link" to="/report">Report</Link></li>
         </ul>
+
       </div>
 
       {/* Main Dashboard */}
       <div className="dashboard-main">
-        <h2>Fetch Images by Subfloor and Date</h2>
+        <div className="dashboard-topbar">  
+          <h2>Fetch Images by Subfloor</h2>
+          <button className="logout-btn" onClick={handleLogout}>
+            Logout
+          </button>
+        </div>
 
         <div className="dashboard-controls">
-          <select onChange={(e) => setSelectedSubfloor(e.target.value)} value={selectedSubfloor}>
+          <select
+            onChange={(e) => {
+              const subfloor = e.target.value;
+              setSelectedSubfloor(subfloor);
+              fetchImages(subfloor); // fetch images immediately
+            }}
+            value={selectedSubfloor}
+          >
             <option disabled value="">-- Select Subfloor --</option>
             {subfloors.map((sub, i) => (
               <option key={i}>{sub}</option>
             ))}
           </select>
 
-          <DatePicker
-            selected={selectedDate}
-            onChange={(date) => setSelectedDate(date)}
-            placeholderText="Select a date"
-            dateFormat="yyyy-MM-dd"
-            className="datepicker"
-          />
-
-          <button onClick={fetchImages} disabled={loading}>
+          <button onClick={() => fetchImages(selectedSubfloor)} disabled={loading}>
             {loading ? 'Loading...' : 'Search Image'}
           </button>
         </div>
 
         <div className="dashboard-image-section">
-          <h3>
-            Floor List with Images ({selectedSubfloor || 'None'})
-            {selectedDate && ` on ${formatDate(selectedDate)}`}
-          </h3>
+          <h3>Floor List with Images ({selectedSubfloor || 'None'})</h3>
           <table className="floor-image-table">
             <thead>
               <tr>
@@ -155,7 +137,7 @@ function Dashboard() {
             </thead>
             <tbody>
               {floorOptionsEn.map((floor, index) => {
-                const floorImages = filteredImages.filter(
+                const floorImages = images.filter(
                   (img) =>
                     img.floorName === floor &&
                     img.subFloorName === selectedSubfloor
@@ -170,11 +152,11 @@ function Dashboard() {
                           {floorImages.map((img) => (
                             <div key={img.id} className="image-item">
                               <img
-                                src={`${Api_link}/floorData/${img.id}/image`}   // ✅ dynamic
+                                src={`${Api_link}/floorData/${img.id}/image`}
                                 alt={img.taskImage}
                                 className="floor-thumbnail"
                                 onClick={() =>
-                                  setPreviewImage(`${Api_link}/floorData/${img.id}/image`) // ✅ dynamic
+                                  setPreviewImage(`${Api_link}/floorData/${img.id}/image`)
                                 }
                               />
                               <span className="image-label">{img.taskImage}</span>
