@@ -5,35 +5,51 @@ import "../CSS/Report.css";
 import Api_link from '../Config/apiconfig';
 
 const Report = () => {
+  // Predefined floors and subfloors
+  const mainFloors = [
+    'Basement 2', 'Basement 1', 'Ground Floor',
+    '1st Floor', '2nd Floor', '3rd Floor', '4th Floor', '5th Floor',
+    '6th Floor', '7th Floor', '8th Floor', '9th Floor', '10th Floor',
+    '11th Floor', '12th Floor', '13th Floor', '14th Floor', '15th Floor',
+    '16th Floor', '17th Floor', '18th Floor', '19th Floor', '20th Floor',
+    '21st Floor', '22nd Floor', '23rd Floor', '24th Floor', '25th Floor',
+    '26th Floor', '27th Floor'
+  ];
+
+  const subFloors = [
+    'East Lobby Area', 'West Lobby Area', 'Washroom', 'Common Area',
+    'Back Tericota', 'Marble Tericota', 'Meeting Room', 'Conference Room', 'Pantry Area'
+  ];
+
   const [images, setImages] = useState([]);
   const [filteredImages, setFilteredImages] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [selectedFloor, setSelectedFloor] = useState("");
+  const [selectedSubFloor, setSelectedSubFloor] = useState("");
   const [imageURLs, setImageURLs] = useState({});
 
-  // Fetch all images from backend
+  // Fetch images from backend
   useEffect(() => {
     fetchImages();
   }, []);
 
   const fetchImages = async () => {
     try {
-      const token = localStorage.getItem("token"); // optional, if backend requires auth
+      const token = localStorage.getItem("token"); // optional
       const res = await fetch(`${Api_link}/floorData/images?page=0&size=100`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       const data = await res.json();
-      console.log("Backend response:", data);
-      const allData = data._embedded?.floorDatas || data; // fallback if no _embedded
+      const allData = data._embedded?.floorDatas || data; // fallback
       setImages(allData);
 
-      // Pre-build image URLs
+      // Prebuild image URLs
       const urls = {};
       allData.forEach((item) => {
         urls[item.id] = `${Api_link}/floorData/${item.id}/image`;
       });
       setImageURLs(urls);
-
     } catch (error) {
       console.error("Error fetching floor data:", error);
     }
@@ -47,29 +63,33 @@ const Report = () => {
 
     const start = new Date(startDate);
     const end = new Date(endDate);
-    end.setHours(23, 59, 59, 999); // include full end day
+    end.setHours(23, 59, 59, 999);
 
     const result = images.filter((item) => {
       if (!item.taskImage) return false;
 
-      // Extract date from filename: YYYY-MM-DD-HH-MM
+      // Filter by date
       const match = item.taskImage.match(/\d{4}-\d{2}-\d{2}-\d{2}-\d{2}/);
       if (!match) return false;
-
       const [y, m, d, hr, min] = match[0].split("-").map(Number);
       const date = new Date(y, m - 1, d, hr, min);
+      if (date < start || date > end) return false;
 
-      return date >= start && date <= end;
+      // Filter by floor
+      if (selectedFloor && item.floorName !== selectedFloor) return false;
+
+      // Filter by subfloor
+      if (selectedSubFloor && item.subFloorName !== selectedSubFloor) return false;
+
+      return true;
     });
 
-    console.log("Filtered images:", result);
     setFilteredImages(result);
   };
 
   const extractDateFromFilename = (filename) => {
     const match = filename.match(/\d{4}-\d{2}-\d{2}-\d{2}-\d{2}/);
     if (!match) return null;
-
     const [y, m, d, hr, min] = match[0].split("-").map(Number);
     const date = new Date(y, m - 1, d, hr, min);
     return date.toLocaleString();
@@ -107,31 +127,37 @@ const Report = () => {
 
       <div className="filter-bar">
         <label>
-          Start Date:
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-          />
+          Floor:
+          <select value={selectedFloor} onChange={e => setSelectedFloor(e.target.value)}>
+            <option value="">All Floors</option>
+            {mainFloors.map(floor => <option key={floor} value={floor}>{floor}</option>)}
+          </select>
         </label>
+
+        <label>
+          SubFloor:
+          <select value={selectedSubFloor} onChange={e => setSelectedSubFloor(e.target.value)}>
+            <option value="">All SubFloors</option>
+            {subFloors.map(sf => <option key={sf} value={sf}>{sf}</option>)}
+          </select>
+        </label>
+
+        <label>
+          Start Date:
+          <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
+        </label>
+
         <label>
           End Date:
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-          />
+          <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
         </label>
-        <button className="fetch-button" onClick={handleFilter}>
-          Fetch Images
-        </button>
-        <button className="download-button" onClick={handleDownloadPDF}>
-          Download PDF
-        </button>
+
+        <button className="fetch-button" onClick={handleFilter}>Fetch Images</button>
+        <button className="download-button" onClick={handleDownloadPDF}>Download PDF</button>
       </div>
 
       {filteredImages.length === 0 ? (
-        <p className="no-images">No images found for selected date range.</p>
+        <p className="no-images">No images found for selected criteria.</p>
       ) : (
         <table className="report-table">
           <thead>
@@ -156,19 +182,10 @@ const Report = () => {
                   <div className="image-row">
                     {images.map((img) => (
                       <div key={img.id} className="image-card">
-                        <p className="floor-label">
-                          <strong>{img.floorName}</strong> – {img.subFloorName}
-                        </p>
+                        <p className="floor-label"><strong>{img.floorName}</strong> – {img.subFloorName}</p>
                         <p>Type: {img.imageType}</p>
-                        <p>
-                          <strong>Time:</strong>{" "}
-                          {extractDateFromFilename(img.taskImage)?.split(",")[1]}
-                        </p>
-                        {imageURLs[img.id] ? (
-                          <img src={imageURLs[img.id]} alt={img.taskImage} />
-                        ) : (
-                          <p>Loading image...</p>
-                        )}
+                        <p><strong>Time:</strong> {extractDateFromFilename(img.taskImage)?.split(",")[1]}</p>
+                        {imageURLs[img.id] ? <img src={imageURLs[img.id]} alt={img.taskImage} /> : <p>Loading image...</p>}
                       </div>
                     ))}
                   </div>
