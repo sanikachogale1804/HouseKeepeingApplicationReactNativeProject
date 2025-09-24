@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import logo from '../Images/logo.png';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -8,7 +8,6 @@ import '../CSS/Dashboard.css';
 import Api_link from '../Config/apiconfig';
 
 function Dashboard() {
-  const [selectedSubfloor, setSelectedSubfloor] = useState('');
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
@@ -16,14 +15,9 @@ function Dashboard() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem("token"); // remove token
-    navigate("/"); // redirect to login page (ya aapka login route)
+    localStorage.removeItem("token");
+    navigate("/");
   };
-
-  const subfloors = [
-    'East Lobby Area', 'West Lobby Area', 'Washroom', 'Common Area',
-    'Back Tericota', 'Marble Tericota', 'Meeting Room', 'Conference Room', 'Pantry Area',
-  ];
 
   const getSuffix = (n) => {
     const j = n % 10, k = n % 100;
@@ -41,45 +35,39 @@ function Dashboard() {
     ...Array.from({ length: 27 }, (_, i) => `${getSuffix(i + 1)} Floor`),
   ];
 
-  // Fetch images whenever subfloor changes
-  const fetchImages = async (subfloor) => {
-    if (!subfloor) return;
-
+  const fetchImages = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      if (!token) {
-        alert('User not authenticated. Please login.');
-        return;
-      }
+      if (!token) return;
 
-      const encodedSubfloor = encodeURIComponent(subfloor);
-      const response = await fetch(
-        `${Api_link}/floorData/images?subFloorName=${encodedSubfloor}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP ${response.status}: ${errorText}`);
-      }
-
+      const response = await fetch(`${Api_link}/floorData/images`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await response.json();
-      console.log('Fetched images:', data);
-      setImages(data);
-    } catch (error) {
-      console.error('Error fetching images:', error);
-      alert('Failed to fetch images: ' + error.message);
+
+      // Local today date
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      const todayStr = `${yyyy}-${mm}-${dd}`;
+
+      // Filter all images for today
+      const todayImages = data.filter(img => img.taskImage?.includes(todayStr));
+
+      setImages(todayImages);
+    } catch (err) {
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
+
+
+  useEffect(() => {
+    fetchImages();
+  }, []);
 
   return (
     <div className="admin-container">
@@ -94,84 +82,65 @@ function Dashboard() {
           <li><Link className="sidebar-link" to="/admin">User Management</Link></li>
           <li><Link className="sidebar-link" to="/report">Report</Link></li>
         </ul>
-
       </div>
 
       {/* Main Dashboard */}
       <div className="dashboard-main">
-        <div className="dashboard-topbar">  
-          <h2>Fetch Images by Subfloor</h2>
+        <div className="dashboard-topbar">
+          <h2>All Floor Images</h2>
           <button className="logout-btn" onClick={handleLogout}>
             Logout
           </button>
         </div>
 
-        <div className="dashboard-controls">
-          <select
-            onChange={(e) => {
-              const subfloor = e.target.value;
-              setSelectedSubfloor(subfloor);
-              fetchImages(subfloor); // fetch images immediately
-            }}
-            value={selectedSubfloor}
-          >
-            <option disabled value="">-- Select Subfloor --</option>
-            {subfloors.map((sub, i) => (
-              <option key={i}>{sub}</option>
-            ))}
-          </select>
-
-          <button onClick={() => fetchImages(selectedSubfloor)} disabled={loading}>
-            {loading ? 'Loading...' : 'Search Image'}
-          </button>
-        </div>
-
         <div className="dashboard-image-section">
-          <h3>Floor List with Images ({selectedSubfloor || 'None'})</h3>
-          <table className="floor-image-table">
-            <thead>
-              <tr>
-                <th>Floor Name</th>
-                <th>Images</th>
-              </tr>
-            </thead>
-            <tbody>
-              {floorOptionsEn.map((floor, index) => {
-                const floorImages = images.filter(
-                  (img) =>
-                    img.floorName === floor &&
-                    img.subFloorName === selectedSubfloor
-                );
+          <h3>Floor List with Images</h3>
+          {loading ? (
+            <p>Loading...</p>
+          ) : (
+            <table className="floor-image-table">
+              <thead>
+                <tr>
+                  <th>Floor Name</th>
+                  <th>Images</th>
+                </tr>
+              </thead>
+              <tbody>
+                {floorOptionsEn.map((floor, index) => {
+                  const floorImages = images.filter(
+                    (img) => img.floorName.replace(/_/g, ' ') === floor
+                  );
 
-                return (
-                  <tr key={index}>
-                    <td>{floor}</td>
-                    <td>
-                      {floorImages.length > 0 ? (
-                        <div className="floor-image-row">
-                          {floorImages.map((img) => (
-                            <div key={img.id} className="image-item">
-                              <img
-                                src={`${Api_link}/floorData/${img.id}/image`}
-                                alt={img.taskImage}
-                                className="floor-thumbnail"
-                                onClick={() =>
-                                  setPreviewImage(`${Api_link}/floorData/${img.id}/image`)
-                                }
-                              />
-                              <span className="image-label">{img.taskImage}</span>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <span className="no-image">No images</span>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                  return (
+                    <tr key={index}>
+                      <td>{floor}</td>
+                      <td>
+                        {floorImages.length > 0 ? (
+                          <div className="floor-image-row">
+                            {floorImages.map((img) => (
+                              <div key={img.id} className="image-item">
+                                <img
+                                  src={`${Api_link}/floorData/${img.id}/image`}
+                                  alt={img.taskImage}
+                                  className="floor-thumbnail"
+                                  onClick={() =>
+                                    setPreviewImage(`${Api_link}/floorData/${img.id}/image`)
+                                  }
+                                />
+                                <span className="image-label">{img.taskImage}</span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="no-image">No images</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
         </div>
 
         {previewImage && (

@@ -103,9 +103,9 @@
 .floor-image-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 10px;
+  gap: 10px;
 }
+
 
 .image-item {
   display: flex;
@@ -116,11 +116,11 @@
   word-break: break-word;
 }
 
-.image-item img {
+/* .image-item img {
   width: 100%;
   height: auto;
   border-radius: 4px;
-}
+} */
 
 .image-label {
   margin-top: 4px;
@@ -191,15 +191,13 @@
   font-style: italic;
 }
 
-/* Optional: Image preview hover effect */
 .floor-thumbnail {
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  width: 150px;
+  height: 150px;      /* fixed height */
+  object-fit: cover;   /* makes all images fit without distortion */
+  border-radius: 8px;
   cursor: pointer;
-  transition: transform 0.2s ease-in-out;
+  border: 1px solid #ccc;
 }
 
 .floor-thumbnail:hover {

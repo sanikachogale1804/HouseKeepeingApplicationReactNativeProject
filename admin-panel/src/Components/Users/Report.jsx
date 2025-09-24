@@ -12,6 +12,7 @@ const Report = () => {
   const [endDate, setEndDate] = useState("");
   const [imageURLs, setImageURLs] = useState({});
 
+
   useEffect(() => {
     fetchImages();
   }, []);
@@ -43,6 +44,9 @@ const Report = () => {
       const start = new Date(startDate);
       const end = new Date(endDate);
 
+      // ✅ end ko din ke last tak le jao
+      end.setHours(23, 59, 59, 999);
+
       const result = images.filter((item) => {
         if (!item.taskImage) return false;
 
@@ -51,6 +55,7 @@ const Report = () => {
 
         const [y, m, d, hr, min] = match[0].split("-").map(Number);
         const date = new Date(y, m - 1, d, hr, min);
+
         return date >= start && date <= end;
       });
 
@@ -75,6 +80,7 @@ const Report = () => {
       alert("Failed to load images.");
     }
   };
+
 
   const extractDateFromFilename = (filename) => {
     const match = filename.match(/\d{4}-\d{2}-\d{2}-\d{2}-\d{2}/);
