@@ -7,7 +7,7 @@ import Api_link from '../Config/apiconfig';
 const Report = () => {
   // Predefined floors and subfloors
   const mainFloors = [
-    'Basement 2', 'Basement 1', 'Ground Floor',
+    'Basement 2', 'Basement 1', 'Ground Floor','MZ Floor',
     '1st Floor', '2nd Floor', '3rd Floor', '4th Floor', '5th Floor',
     '6th Floor', '7th Floor', '8th Floor', '9th Floor', '10th Floor',
     '11th Floor', '12th Floor', '13th Floor', '14th Floor', '15th Floor',

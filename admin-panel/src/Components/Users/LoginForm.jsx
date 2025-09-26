@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { jwtDecode } from 'jwt-decode'; // ✅ Correct import (note: no curly braces)
+import { jwtDecode } from 'jwt-decode';
 import Api_link from '../Config/apiconfig';
+import '../CSS/LoginForm.css';
+import logo from "../Images/logo.png"; 
 
 function LoginForm() {
   const [username, setUsername] = useState('');
@@ -8,27 +10,19 @@ function LoginForm() {
 
   const handleLogin = async () => {
     try {
-      console.log("Api_link => ", Api_link);
       const url = `${Api_link}/login?username=${encodeURIComponent(username)}&userPassword=${encodeURIComponent(userPassword)}`;
-      console.log("Login URL =>", url); // check final URL
-
-      const response = await fetch(url); // GET request
-      const token = await response.text(); // Raw token
+      const response = await fetch(url);
+      const token = await response.text();
 
       if (response.ok && token && token.length > 10) {
-        // ✅ Decode the token
         const decoded = jwtDecode(token);
-
-        // 🔐 Extract role
         const role = decoded.role || decoded.roles?.[0] || decoded.authorities?.[0];
 
-        // 🚫 Only allow admin
         if (!role || role.toLowerCase() !== 'admin') {
           alert('⛔ Access Denied: Only admin can log in');
           return;
         }
 
-        // ✅ Store and proceed
         localStorage.setItem('token', token);
         alert('✅ Login successful!');
         window.location.href = '/admin-panel/dashboard';
@@ -41,27 +35,37 @@ function LoginForm() {
   };
 
   return (
-    <div style={{ padding: 20, fontFamily: 'Arial' }}>
-      <h2>Login</h2>
+    <div className="login-container"> 
+      {/* Use a clean background image without the text for this setup */}
+      {/* Container for the custom headings */}
+      <div className="custom-headings">
+        <h1 className="main-heading">
+          COGENT 
+        </h1>
+        <h3 className="sub-heading">FACILITIES MANAGEMENT SERVICES </h3>
+        <h4 className="sub-heading-small">HOUSEKEEPING & FACILITIES MANAGEMENT</h4>
+      </div>
 
-      <input
-        placeholder="Username"
-        onChange={(e) => setUsername(e.target.value)}
-        value={username}
-        style={{ padding: 8, width: '100%', marginBottom: 12 }}
-      />
-
-      <input
-        placeholder="Password"
-        type="password"
-        onChange={(e) => setUserPassword(e.target.value)}
-        value={userPassword}
-        style={{ padding: 8, width: '100%', marginBottom: 12 }}
-      />
-
-      <button onClick={handleLogin} style={{ padding: '10px 20px' }}>
-        Login
-      </button>
+      <div className="login-card">
+        <img src={logo} alt="Logo" className="login-logo" />
+        <h2>Admin Login</h2>
+        <input
+          className="login-input"
+          placeholder="Username"
+          onChange={(e) => setUsername(e.target.value)}
+          value={username}
+        />
+        <input
+          className="login-input"
+          placeholder="Password"
+          type="password"
+          onChange={(e) => setUserPassword(e.target.value)}
+          value={userPassword}
+        />
+        <button className="login-btn" onClick={handleLogin}>
+          Login
+        </button>
+      </div>
     </div>
   );
 }

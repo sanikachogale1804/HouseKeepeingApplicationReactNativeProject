@@ -1,0 +1,115 @@
+/* --- Background container with Dark Overlay --- */
+.login-container {
+  /* The dark gradient remains the same to keep the text readable */
+  background-image: 
+    linear-gradient(
+      to bottom, 
+      rgba(0, 0, 0, 0.4) 0%, 
+      rgba(0, 0, 0, 0.1) 40%, 
+      transparent 60%        
+    ),
+    url('../Images/Cogent\ background\ image.png'); /* <--- MAKE SURE THIS IS YOUR CLEAN IMAGE PATH */
+
+  background-size: cover; 
+  background-position: center; 
+  background-repeat: no-repeat; 
+
+  min-height: 100vh;
+  width: 100%; 
+  display: flex;
+  flex-direction: column; 
+  justify-content: center; /* Center content vertically */
+  align-items: center; 
+}
+
+
+.custom-headings {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #fff; 
+  text-align: center;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8); 
+  
+  margin-bottom: 60px; /* Increased from 20px to 60px */
+  margin-top: -200px; /* Moves the text block up the screen */
+}
+
+/* Style for H1 (COGENT) */
+.main-heading { 
+  font-size: 3.5em; 
+  font-weight: bold;
+  margin: 0; 
+  line-height: 1.2;
+}
+.sub-heading {
+  font-size: 1.5em; 
+  font-weight: normal;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  letter-spacing: 1.5px;
+
+  border-bottom: 2px solid #fff; /* white underline, 2px thick */
+  padding-bottom: 5px;           /* space between text and underline */
+}
+
+/* Style for H4 (HOUSEKEEPING & FACILITIES MANAGEMENT) */
+.sub-heading-small {
+  font-size: 1em; 
+  font-weight: normal;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+
+/* --- Login Card Styling (Position remains centered) --- */
+.login-card {
+  /* Resetting margin-top ensures the card stays centered relative to the flex container (login-container) 
+     after the headings block has been pulled up. */
+  margin-top: 0; 
+  
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 30px 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 350px;
+}
+.login-logo {
+  /* Assuming this logo is the image inside the login card */
+  width: 100px; 
+  margin-bottom: 15px; 
+}
+
+h2 {
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.login-input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px; 
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box; 
+}
+
+.login-btn {
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff; 
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.login-btn:hover {
+  background-color: #0056b3;
+}
