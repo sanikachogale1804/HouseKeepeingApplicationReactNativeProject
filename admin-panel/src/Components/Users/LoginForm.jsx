@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import Api_link from '../Config/apiconfig';
 import '../CSS/LoginForm.css';
-import logo from "../Images/logo.png"; 
+import logo from "../Images/logo.png";
 
 function LoginForm() {
   const [username, setUsername] = useState('');
@@ -35,16 +35,19 @@ function LoginForm() {
   };
 
   return (
-    <div className="login-container"> 
+    <div className="login-container">
       {/* Use a clean background image without the text for this setup */}
       {/* Container for the custom headings */}
+
       <div className="custom-headings">
-        <h1 className="main-heading">
-          COGENT 
-        </h1>
+        <div className="heading-with-logo">
+          <img src={logo} alt="Logo" className="heading-logo" />
+          <h1 className="main-heading">COGENT</h1>
+        </div>
         <h3 className="sub-heading">FACILITIES MANAGEMENT SERVICES </h3>
         <h4 className="sub-heading-small">HOUSEKEEPING & FACILITIES MANAGEMENT</h4>
       </div>
+
 
       <div className="login-card">
         <img src={logo} alt="Logo" className="login-logo" />

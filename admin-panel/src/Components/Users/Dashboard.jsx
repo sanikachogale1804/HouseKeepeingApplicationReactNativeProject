@@ -87,7 +87,7 @@ function Dashboard() {
       {/* Main Dashboard */}
       <div className="dashboard-main">
         <div className="dashboard-topbar">
-          <h2>All Floor Images</h2>
+          <h2>Dashboard</h2>
           <button className="logout-btn" onClick={handleLogout}>
             Logout
           </button>

@@ -32,16 +32,37 @@
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8); 
   
   margin-bottom: 60px; /* Increased from 20px to 60px */
-  margin-top: -200px; /* Moves the text block up the screen */
+
+  margin-top: -80px; /* Thoda upar karo, lekin safe value */
+
+
 }
 
-/* Style for H1 (COGENT) */
-.main-heading { 
-  font-size: 3.5em; 
-  font-weight: bold;
-  margin: 0; 
-  line-height: 1.2;
+.heading-with-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px; /* spacing between logo and COGENT */
+  flex-wrap: wrap; /* allow items to move below if screen is too small */
+  text-align: center;
 }
+
+.heading-logo {
+  width: 60px;   /* default size */
+  height: auto;
+}
+
+
+/* Style for H1 (COGENT) */
+.main-heading {
+  font-size: 3.5em;
+  font-weight: bold;
+  margin: 0;
+  line-height: 1.2;
+  color: #fff;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+}
+
 .sub-heading {
   font-size: 1.5em; 
   font-weight: normal;
@@ -68,7 +89,7 @@
      after the headings block has been pulled up. */
   margin-top: 0; 
   
-  background-color: rgba(255, 255, 255, 0.95);
+  background-color: transparent;
   padding: 30px 30px;
   border-radius: 10px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
@@ -80,31 +101,33 @@
 }
 .login-logo {
   /* Assuming this logo is the image inside the login card */
-  width: 100px; 
+  width: 70px; 
   margin-bottom: 15px; 
 }
 
 h2 {
   margin-bottom: 15px;
-  color: #333;
+  color: black;
 }
 
 .login-input {
-  width: 100%;
+width: 100%;
   padding: 10px;
-  margin-bottom: 10px; 
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  box-sizing: border-box; 
+  margin-bottom: 1rem;
+  border-radius: 20px;
+  border: 1px solid #0a0101;
+  font-size: 16px;
+  background-color: transparent;
+  color: black;
 }
 
 .login-btn {
-  width: 100%;
+ width: 50%;
   padding: 10px;
   background-color: #007bff; 
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 20px;
   cursor: pointer;
   font-size: 16px;
   transition: background-color 0.3s ease;
@@ -112,4 +135,46 @@ h2 {
 
 .login-btn:hover {
   background-color: #0056b3;
+}
+
+
+/* When screen is smaller than 768px (tablet/laptop) */
+@media (max-width: 768px) {
+  .heading-with-logo {
+    flex-direction: column; /* stack logo above COGENT */
+    gap: 5px;
+  }
+
+  .heading-logo {
+    width: 50px; /* make logo smaller */
+  }
+
+  .main-heading {
+    font-size: 2.5em; /* reduce font size */
+  }
+}
+
+/* When screen is very small (mobile) */
+@media (max-width: 480px) {
+  .heading-logo {
+    width: 40px;
+  }
+
+  .main-heading {
+    font-size: 2em;
+  }
+
+  .sub-heading {
+    font-size: 1.2em;
+  }
+
+  .sub-heading-small {
+    font-size: 0.9em;
+  }
+}
+
+@media (max-height: 800px) {
+  .custom-headings {
+    margin-top: -40px; /* Chhoti screen/laptop ke liye aur kam shift */
+  }
 }
