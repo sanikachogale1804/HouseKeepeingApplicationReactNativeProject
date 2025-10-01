@@ -6,6 +6,7 @@ import ImageFetcher from './Components/Users/ImageFetcher';
 import LoginForm from './Components/Users/LoginForm';
 import ImageCalendar from './Components/Users/ImageCalendar';
 import Report from './Components/Users/Report';
+import Supervisor from './Components/Users/Supervisor';
 
 
 const App = () => {
@@ -18,6 +19,7 @@ const App = () => {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/imageCalendar" element={<ImageCalendar />} />
         <Route path="/report" element={<Report />} />
+        <Route path="/supervisor" element={<Supervisor />} />
       </Routes>
     </Router>
   );

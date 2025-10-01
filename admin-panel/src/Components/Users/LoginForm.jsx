@@ -18,14 +18,21 @@ function LoginForm() {
         const decoded = jwtDecode(token);
         const role = decoded.role || decoded.roles?.[0] || decoded.authorities?.[0];
 
-        if (!role || role.toLowerCase() !== 'admin') {
-          alert('⛔ Access Denied: Only admin can log in');
+        // 👇 parentheses add kiye taaki warning na aaye
+        if (!role || (role.toLowerCase() !== 'admin' && role.toLowerCase() !== 'supervisor')) {
+          alert('⛔ Access Denied: Only admin or supervisor can log in');
           return;
         }
 
         localStorage.setItem('token', token);
         alert('✅ Login successful!');
-        window.location.href = '/admin-panel/dashboard';
+
+        // 👇 ab role check isi block me hoga (bahar likhne ki zaroorat nahi)
+        if (role.toLowerCase() === 'admin') {
+          window.location.href = '/admin-panel/dashboard';
+        } else if (role.toLowerCase() === 'supervisor') {
+          window.location.href = '/admin-panel/supervisor'; // yaha aapka supervisor page ka path
+        }
       } else {
         alert('❌ Login failed: Invalid credentials');
       }
@@ -51,7 +58,7 @@ function LoginForm() {
 
       <div className="login-card">
         <img src={logo} alt="Logo" className="login-logo" />
-        <h2>Admin Login</h2>
+        <h2>Login</h2>
         <input
           className="login-input"
           placeholder="Username"

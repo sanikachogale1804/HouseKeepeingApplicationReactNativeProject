@@ -6,6 +6,8 @@ import '../CSS/AdminPanel.css';
 import '../CSS/Dashboard.css';
 
 import Api_link from '../Config/apiconfig';
+import { MdDashboard, MdPeople, MdInsertChart } from 'react-icons/md';
+
 
 function Dashboard() {
   const [images, setImages] = useState([]);
@@ -53,10 +55,13 @@ function Dashboard() {
       const dd = String(today.getDate()).padStart(2, '0');
       const todayStr = `${yyyy}-${mm}-${dd}`;
 
-      // Filter all images for today
-      const todayImages = data.filter(img => img.taskImage?.includes(todayStr));
+      const approvedTodayImages = data.filter(
+        (img) =>
+          img.taskImage?.includes(todayStr) &&
+          (img.approved === true || img.approved === 1 || img.approved === "Y" || img.approved === "APPROVED")
+      );
 
-      setImages(todayImages);
+      setImages(approvedTodayImages);
     } catch (err) {
       console.error(err);
     } finally {
@@ -71,28 +76,40 @@ function Dashboard() {
 
   return (
     <div className="admin-container">
-      {/* Sidebar */}
+      {/* Sidebar only for Admin Panel */}
       <div className="sidebar">
-        <div className="sidebar-logo">
-          <img src={logo} alt="Logo" className="logo" />
-        </div>
-        <div className="admin-title">Admin Panel</div>
+        {/* <div className="admin-title">Admin Panel</div> */}
         <ul className="sidebar-links">
-          <li><Link className="sidebar-link" to="/dashboard">Dashboard</Link></li>
-          <li><Link className="sidebar-link" to="/admin">User Management</Link></li>
-          <li><Link className="sidebar-link" to="/report">Report</Link></li>
+          <li>
+            <Link className="sidebar-link active" to="/dashboard">
+              <MdDashboard className="sidebar-icon" /> Dashboard
+            </Link>
+          </li>
+          <li>
+            <Link className="sidebar-link" to="/admin">
+              <MdPeople className="sidebar-icon" /> User Management
+            </Link>
+          </li>
+          <li>
+            <Link className="sidebar-link" to="/report">
+              <MdInsertChart className="sidebar-icon" /> Report
+            </Link>
+          </li>
         </ul>
       </div>
 
       {/* Main Dashboard */}
       <div className="dashboard-main">
+        {/* Topbar with logo, title, and logout */}
         <div className="dashboard-topbar">
-          <h2>Dashboard</h2>
-          <button className="logout-btn" onClick={handleLogout}>
-            Logout
-          </button>
+          <div className="topbar-left">
+            <img src={logo} alt="Logo" className="topbar-logo" />
+            <h2>Dashboard</h2>
+          </div>
+          <button className="logout-btn" onClick={handleLogout}>Logout</button>
         </div>
 
+        {/* Image Section */}
         <div className="dashboard-image-section">
           <h3>Floor List with Images</h3>
           {loading ? (
@@ -110,6 +127,7 @@ function Dashboard() {
                   const floorImages = images.filter(
                     (img) => img.floorName.replace(/_/g, ' ') === floor
                   );
+
 
                   return (
                     <tr key={index}>
@@ -143,6 +161,12 @@ function Dashboard() {
           )}
         </div>
 
+        {/* Footer */}
+        <div className="dashboard-footer">
+          © {new Date().getFullYear()} Cogent Safety and Security Pvt Ltd. All rights reserved.
+        </div>
+
+        {/* Image Preview Modal */}
         {previewImage && (
           <div className="image-preview-modal" onClick={() => setPreviewImage(null)}>
             <img src={previewImage} alt="Full View" />

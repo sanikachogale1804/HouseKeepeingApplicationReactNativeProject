@@ -5,22 +5,59 @@
   min-height: 100vh;
 }
 
-/* Main dashboard content */
+/* Container Layout: Side-by-side layout */
+.admin-container {
+    display: flex;
+    min-height: 100vh;
+    /* ✅ महत्वपूर्ण: यहां कोई padding या margin नहीं होना चाहिए */
+}
+
+/* .admin-title {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: left;
+    padding: 15px 20px;
+    margin: 0;
+    background-color: #2c3e50;
+    height: 60px;  
+    line-height: 60px; 
+} */
+
 .dashboard-main {
-  margin-left: 260px;
-  padding: 20px;
-  flex: 1;
-  background-color: #f3f4f6;
-  box-sizing: border-box;
+    margin-left: 0; 
+    width: 100%; 
+    flex-grow: 1; 
+    padding: 10px;
+    background-color: #f3f4f6;
+    min-height: 100vh;
+    box-sizing: border-box;
+     margin-top: 53px; 
+    
+    /* ... (बाकी स्टाइल्स) ... */
+    padding: 20px;
 }
 
-/* Title */
-.dashboard-main h2 {
-  color: #2c3e50;
-  margin-bottom: 20px;
-  text-align: center;
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
+.topbar-logo {
+  display: inline-block;      
+  height: 40px;
+  width: auto;
+  background-color: white;    
+  padding: 3px 70px;   /* top-bottom 15px, left-right 20px */
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.dashboard-topbar h2 {
+  color: white;
+  margin: 0;
+}
 /* Controls Section */
 .dashboard-controls {
   display: flex;
@@ -59,18 +96,20 @@
   background-color: #2980b9;
 }
 
-/* Image List Section */
 .dashboard-image-section {
   background-color: #fff;
-  padding: 20px;
+  padding: 3px 10px; /* padding-top ko thoda kam kiya */
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-left: 240px;
+  margin-top: 10px; /* ✅ section ko upar khinchne ke liye */
 }
 
 .dashboard-image-section h3 {
   font-size: 20px;
   color: #2c3e50;
   margin-bottom: 15px;
+  margin-top: px; /* ✅ heading ko section ke top se pass laane ke liye */
 }
 
 .floor-image-group {
@@ -237,13 +276,28 @@
 }
 
 .dashboard-topbar {
-  display: flex;
-  justify-content: center; 
-  align-items: center;
-  margin-bottom: 20px;
-  background-color: lightblue;
+  
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    background-color:#1877b6;/* ✅ blue background */
+    padding: 15px 20px 15px 10px; 
+    border-radius: 8px;
+    margin-bottom: 20px;
+    /* ✅ FIXED PROPERTIES ADDED */
+    position: fixed; 
+    top: 0;
+    left: 0px;     /* Sidebar की width के बाद शुरू होगा */
+    right: 0;        /* पूरी चौड़ाई लेगा */
+    z-index: 1000;   /* सुनिश्चित करता है कि यह अन्य तत्वों के ऊपर रहे */
+     /* Original Styles */
+    padding: 15px 20px 15px 10px; 
+    border-radius: 0; /* Fixed होने पर corner radius हटाना पड़ता है */
+    /* margin-bottom: 20px; हटा दें, क्योंकि fixed होने पर इसकी ज़रूरत नहीं है */
 }
 
+
+/* Logout button */
 .logout-btn {
   padding: 10px 15px;
   background-color: #e63946;
@@ -252,9 +306,6 @@
   border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
-  position: absolute;
-  right: 0;
-  margin: 25px;
 }
 
 .logout-btn:hover {
@@ -263,10 +314,16 @@
 
 /* Responsive Behavior */
 @media (max-width: 768px) {
-  .dashboard-main {
+   .dashboard-main {
     margin-left: 0;
+    width: 100%;
   }
 
+  .sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+  }
   .dashboard-controls {
     flex-direction: column;
     align-items: stretch;
@@ -275,4 +332,57 @@
   .floor-name {
     min-width: 100px;
   }
+}
+
+/* Sidebar height kam karo */
+.sidebar {
+   position: fixed;
+    top: 85px;
+    width: 240px;
+    background-color: white; /* ✅ changed from #2c3e50 to white */
+    color: black;  
+    height: 1000px;  /* auto height according to content */
+    padding-top: 0;
+    box-sizing: border-box;
+    overflow-y: auto; /* agar content zyada hua to scroll aaye */
+     z-index: 100;
+}
+
+/* Sidebar links */
+.sidebar-links {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  color: #333;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.sidebar-link:hover {
+  background-color: #e6f0fa;
+  color: #1877b6;
+}
+.sidebar-icon {
+  width: 22px;
+  height: 22px;
+  margin-right: 12px;
+  vertical-align: middle;
+  color: #1877b6; /* Company blue */
+}
+
+.dashboard-footer {
+  text-align: center;
+  padding: 15px 0;
+  margin-top: 30px;
+  font-size: 14px;
+  color: white;
+  border-top: 1px solid #ddd;
+  background-color:#1877b6;
 }

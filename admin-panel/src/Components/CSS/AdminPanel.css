@@ -1,104 +1,24 @@
-/* Layout */
-.admin-container {
-  display: flex;
-}
-
+/* Dashboard Container */
 .dashboard-container {
-  margin-top: -20px;
   width: 100%;
-  box-sizing: border-box;
-}
-
-/* Sidebar */
-.sidebar {
-  width: 240px;
-  height: 100vh;
-  background-color: #1e2a38;
   padding: 20px;
-  position: fixed;
-  left: 0;
-  top: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  border-right: 1px solid #ccc;
-}
-
-.sidebar-logo img.logo {
-  width: 60px;
-  margin-bottom: 20px;
-  border-radius: 8px;
-}
-
-.admin-title {
-  color: white;
-  font-size: 28px;
-  font-weight: bold;
-  margin-bottom: 20px;
-}
-
-.sidebar-links {
-  list-style-type: none;
-  padding: 0;
-  width: 100%;
-}
-
-.sidebar-link {
-  display: block;
-  width: 100%;
-  padding: 12px 16px;
-  margin: 8px 0;
-  color: #ecf0f1;
-  text-decoration: none;
-  border-radius: 8px;
-  transition: background-color 0.3s;
-}
-
-.sidebar-link:hover {
-  background-color: #34495e;
-}
-
-/* Header Buttons */
-.admin-header-buttons {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  display: flex;
-  gap: 10px;
-}
-
-.home-button-admin,
-.logout-button-admin {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.home-button-admin {
-  background-color: #4CAF50;
-  color: white;
-}
-
-.logout-button-admin {
-  background-color: #f44336;
-  color: white;
-}
-
-.home-button-admin:hover {
-  background-color: #45a049;
-}
-
-.logout-button-admin:hover {
-  background-color: #d32f2f;
-}
-
-.controls-container {
-  width: 100%;
   box-sizing: border-box;
+  /* FIX: अगर किसी पैरेंट CSS में margin-left या width calc() लगा हो,
+    तो उसे ओवरराइड करके 100% पर सेट करें।
+    */
+    width: 100vw; /* पूरी viewport width ले */
+    margin-left: 0 !important; /* सभी left margin को हटा दें */
+    padding-left: 0 !important; /* अगर कोई padding-left हो तो उसे भी हटा दें */
+    
+    /* Original Styles */
+    padding: 20px; 
+    box-sizing: border-box;
+}
+
+/* Controls */
+.controls-container {
   display: flex;
-  flex-direction: row;
+  flex-direction: row; 
   gap: 20px;
   background-color: #34495e;
   padding: 20px;
@@ -107,12 +27,19 @@
   margin-bottom: 20px;
 }
 
-
-.controls-container {
+.filter-search-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
   width: 100%;
-  box-sizing: border-box;
 }
 
+.assign-ticket-container {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  width: 100%;
+}
 
 .controls-container input,
 .controls-container select,
@@ -146,28 +73,12 @@
   background-color: #2980b9;
 }
 
-.filter-search-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  align-items: center;
-  order: 2;
-  width: 100%; /* 🔥 important for full width */
-}
-.assign-ticket-container {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  order: 1;
-  width: 100%; 
-}
-
 /* User Table */
 .ticket-list-container {
   background-color: #fff;
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .ticket-list-container h3 {
@@ -175,12 +86,21 @@
   margin-bottom: 15px;
   color: #2c3e50;
 }
-
 .ticket-table {
   width: 100%;
   border-collapse: collapse;
+  border: 2px solid #1e2a38; /* Table ke charo sides border */
   border-radius: 8px;
   overflow: hidden;
+}
+
+.ticket-table th,
+.ticket-table td {
+  padding: 12px;
+  font-size: 14px;
+  background-color: #fff;
+  border: 1px solid #1e2a38; /* Cell ke charo sides border */
+  color: #333;
 }
 
 .ticket-table th {
@@ -188,19 +108,10 @@
   color: #ecf0f1;
   font-size: 15px;
   font-weight: 600;
-  padding: 12px;
   text-align: left;
 }
 
-.ticket-table td {
-  padding: 12px;
-  font-size: 14px;
-  background-color: #fff;
-  border-bottom: 1px solid #ddd;
-  color: #333;
-}
-
-.ticket-table tr:hover {
+.ticket-table tr:hover td {
   background-color: #eaf4ff;
 }
 
@@ -218,6 +129,7 @@
   background-color: #2980b9;
 }
 
+
 /* Status Label */
 .status-label {
   font-weight: bold;
@@ -227,29 +139,10 @@
   text-transform: uppercase;
 }
 
-.status-label.admin {
-  color: #d35400;
-}
-
-.status-label.user {
-  color: #3498db;
-}
-
-.status-label.housekeeper {
-  color: #16a085;
-}
-
-.status-label.supervisor {
-  color: #8e44ad;
-}
-
-.logo {
-  width: 60px;
-  height: auto;
-  object-fit: contain;
-  margin-bottom: 20px;
-}
-
+.status-label.admin { color: #d35400; }
+.status-label.user { color: #3498db; }
+.status-label.housekeeper { color: #16a085; }
+.status-label.supervisor { color: #8e44ad; }
 
 /* Responsive */
 @media (max-width: 768px) {
@@ -257,28 +150,27 @@
     flex-direction: column;
     align-items: stretch;
   }
-
-  .sidebar {
-    display: none;
-  }
-
-  .admin-header-buttons {
-    position: static;
-    justify-content: flex-end;
-    margin-bottom: 10px;
-  }
-
-  .controls-container,
-  .assign-ticket-container,
-  .filter-search-container {
+  .filter-search-container, .assign-ticket-container {
     flex-direction: column;
     align-items: stretch;
   }
-
-  .ticket-table th,
-  .ticket-table td {
+  .ticket-table th, .ticket-table td {
     font-size: 12px;
     padding: 8px;
   }
 }
 
+/* Footer */
+.dashboard-footer {
+  margin-top: auto; /* Footer ko bottom me push kare */
+  text-align: center;
+  padding: 15px 0;
+  background-color: #f5f5f5;
+  color: #555;
+  font-size: 14px;
+  border-top: 1px solid #ddd;
+}
+.dashboard-logo {
+  height: 50px; /* Logo height adjust kar sakte ho */
+  width: auto;
+}
