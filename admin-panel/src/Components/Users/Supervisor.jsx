@@ -92,7 +92,8 @@ function Supervisor() {
                         <thead>
                             <tr>
                                 <th>Floor Name</th>
-                                <th>Images</th>
+                                <th>Approved Images</th>
+                                <th>Pending Images</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -101,47 +102,70 @@ function Supervisor() {
                                     (img) => img.floorName.replace(/_/g, ' ') === floor
                                 );
 
+                                const approvedImages = floorImages.filter(img => img.approved);
+                                const pendingImages = floorImages.filter(img => !img.approved);
+
                                 return (
                                     <tr key={index}>
                                         <td>{floor}</td>
+
+                                        {/* Approved Images */}
                                         <td>
-                                            {floorImages.length > 0 ? (
+                                            {approvedImages.length > 0 ? (
                                                 <div className="floor-image-row">
-                                                    {floorImages.map((img) => (
+                                                    {approvedImages.map((img) => (
                                                         <div key={img.id} className="image-item">
                                                             <img
                                                                 src={`${Api_link}/floorData/${img.id}/image`}
                                                                 alt={img.taskImage}
                                                                 className="floor-thumbnail"
                                                                 onClick={() =>
-                                                                    setPreviewImage(
-                                                                        `${Api_link}/floorData/${img.id}/image`
-                                                                    )
+                                                                    setPreviewImage(`${Api_link}/floorData/${img.id}/image`)
                                                                 }
                                                             />
                                                             <span className="image-label">{img.taskImage}</span>
-
-                                                            {img.approved ? (
-                                                                <span className="approved-label">✅ Approved</span>
-                                                            ) : (
-                                                                <button
-                                                                    className="approve-btn"
-                                                                    onClick={() => handleApprove(img.id)}
-                                                                >
-                                                                    Approve
-                                                                </button>
-                                                            )}
+                                                            <span className="approved-label">✅ Approved</span>
                                                         </div>
                                                     ))}
                                                 </div>
                                             ) : (
-                                                <span className="no-image">No images</span>
+                                                <span className="no-image">No approved images</span>
+                                            )}
+                                        </td>
+
+                                        {/* Pending Images */}
+                                        <td>
+                                            {pendingImages.length > 0 ? (
+                                                <div className="floor-image-row">
+                                                    {pendingImages.map((img) => (
+                                                        <div key={img.id} className="image-item">
+                                                            <img
+                                                                src={`${Api_link}/floorData/${img.id}/image`}
+                                                                alt={img.taskImage}
+                                                                className="floor-thumbnail"
+                                                                onClick={() =>
+                                                                    setPreviewImage(`${Api_link}/floorData/${img.id}/image`)
+                                                                }
+                                                            />
+                                                            <span className="image-label">{img.taskImage}</span>
+                                                            <button
+                                                                className="approve-btn"
+                                                                onClick={() => handleApprove(img.id)}
+                                                            >
+                                                                Approve
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <span className="no-image">No pending images</span>
                                             )}
                                         </td>
                                     </tr>
                                 );
                             })}
                         </tbody>
+
                     </table>
                 )}
             </div>
