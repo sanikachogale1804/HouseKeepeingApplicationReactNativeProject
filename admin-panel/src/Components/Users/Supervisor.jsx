@@ -5,6 +5,7 @@ function Supervisor() {
     const [images, setImages] = useState([]);
     const [loading, setLoading] = useState(false);
     const [previewImage, setPreviewImage] = useState(null);
+    
 
     const getSuffix = (n) => {
         const j = n % 10, k = n % 100;
@@ -13,6 +14,14 @@ function Supervisor() {
         if (j === 3 && k !== 13) return `${n}rd`;
         return `${n}th`;
     };
+
+    // Extract uploader username from filename
+    const getUploaderFromFilename = (filename) => {
+        if (!filename) return "Unknown";
+        const parts = filename.split('-');
+        return parts[0] || "Unknown"; // first part is assumed as username
+    };
+
 
     const floorOptionsEn = [
         'Basement 2',
@@ -125,7 +134,13 @@ function Supervisor() {
                                                             />
                                                             <span className="image-label">{img.taskImage}</span>
                                                             <span className="approved-label">✅ Approved</span>
+                                                            <span className="uploaded-by">
+                                                                👤 {img.uploadedBy?.username || getUploaderFromFilename(img.taskImage)}
+                                                            </span>
+
+
                                                         </div>
+
                                                     ))}
                                                 </div>
                                             ) : (
@@ -148,6 +163,10 @@ function Supervisor() {
                                                                 }
                                                             />
                                                             <span className="image-label">{img.taskImage}</span>
+                                                            <span className="uploaded-by">
+                                                                👤 {img.uploadedBy?.username || getUploaderFromFilename(img.taskImage)}
+                                                            </span>
+
                                                             <button
                                                                 className="approve-btn"
                                                                 onClick={() => handleApprove(img.id)}
@@ -155,6 +174,7 @@ function Supervisor() {
                                                                 Approve
                                                             </button>
                                                         </div>
+
                                                     ))}
                                                 </div>
                                             ) : (

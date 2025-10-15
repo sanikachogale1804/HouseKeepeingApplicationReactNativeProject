@@ -18,22 +18,23 @@ function LoginForm() {
         const decoded = jwtDecode(token);
         const role = decoded.role || decoded.roles?.[0] || decoded.authorities?.[0];
 
-        // 👇 parentheses add kiye taaki warning na aaye
+        // Save token and username
+        localStorage.setItem("token", token);
+        localStorage.setItem("username", username);
+
         if (!role || (role.toLowerCase() !== 'admin' && role.toLowerCase() !== 'supervisor')) {
           alert('⛔ Access Denied: Only admin or supervisor can log in');
           return;
         }
 
-        localStorage.setItem('token', token);
         alert('✅ Login successful!');
-
-        // 👇 ab role check isi block me hoga (bahar likhne ki zaroorat nahi)
         if (role.toLowerCase() === 'admin') {
           window.location.href = '/admin-panel/dashboard';
         } else if (role.toLowerCase() === 'supervisor') {
-          window.location.href = '/admin-panel/supervisor'; // yaha aapka supervisor page ka path
+          window.location.href = '/admin-panel/supervisor';
         }
-      } else {
+      }
+      else {
         alert('❌ Login failed: Invalid credentials');
       }
     } catch (err) {

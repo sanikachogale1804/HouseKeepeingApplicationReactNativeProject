@@ -66,7 +66,7 @@ const LoginScreen: React.FC = () => {
         }
         const payload = JSON.parse(atob(tokenParts[1]));
 
-        // Adjust this check based on actual structure
+      
         const role = payload.role || payload.roles?.[0] || payload.authorities?.[0];
 
         if (!role || !role.toLowerCase().includes('housekeeper')) {
@@ -75,12 +75,12 @@ const LoginScreen: React.FC = () => {
         }
 
 
-        // ✅ Save token and credentials
         await AsyncStorage.setItem('access_token', responseBody);
         await AsyncStorage.setItem('savedUsername', username);
         await AsyncStorage.setItem('savedPassword', password);
 
         Alert.alert('✅ Success', 'Login successful');
+        await AsyncStorage.setItem('username', username);
         navigation.navigate('FloorData', { user: { username } });
 
       } else {

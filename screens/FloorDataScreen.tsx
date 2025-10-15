@@ -49,6 +49,7 @@ const subFloorOptionsMr = [
   'बाहेरील टेराकोटा', 'मार्बल टेराकोटा', 'बैठक खोली', 'परिषद खोली', 'पँट्री क्षेत्र',
 ];
 
+
 const translations = {
   en: {
     title: 'Add Floor Data',
@@ -84,6 +85,7 @@ const FloorDataScreen = () => {
   const [subFloorName, setSubFloorName] = useState(subFloorOptionsEn[0]);
   const [imageType, setImageType] = useState('BEFORE');
   const [image, setImage] = useState<any>(null);
+  
 
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === 'dark';
@@ -102,8 +104,8 @@ const FloorDataScreen = () => {
 
   const handleSubmit = async () => {
     try {
-      const lanIP = 'http://192.168.1.92:5005';
-      const publicIP = 'http://45.115.186.228:5005';
+      const lanIP = 'https://192.168.1.92:5005';
+      const publicIP = 'https://45.115.186.228:5005';
       const baseUrl = __DEV__ ? lanIP : publicIP;
 
       const response = await fetch(`${baseUrl}/floorData`, {
@@ -121,16 +123,19 @@ const FloorDataScreen = () => {
       const token = await AsyncStorage.getItem('access_token');
       if (!token) throw new Error('No access token found');
 
+      const username = await AsyncStorage.getItem('username');
+
       if (image && floorDataId) {
         const sanitize = (str: string) =>
           str.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
         const now = new Date();
         const pad = (n: number) => (n < 10 ? `0${n}` : n);
-        const customFileName = `${sanitize(floorName)}-${sanitize(
+        const customFileName = `${username ? username + '-' : ''}${sanitize(floorName)}-${sanitize(
           subFloorName
         )}-${imageType}-${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(
           now.getDate()
         )}-${pad(now.getHours())}-${pad(now.getMinutes())}.jpg`;
+
 
         let quality = 0.8;
         let compressedImageUri = image.uri;

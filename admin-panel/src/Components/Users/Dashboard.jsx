@@ -1,19 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import logo from '../Images/logo.png';
 import { Link, useNavigate } from 'react-router-dom';
-
 import '../CSS/AdminPanel.css';
 import '../CSS/Dashboard.css';
-
 import Api_link from '../Config/apiconfig';
 import { MdDashboard, MdPeople, MdInsertChart } from 'react-icons/md';
-
 
 function Dashboard() {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
-
+ 
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -21,6 +18,7 @@ function Dashboard() {
     navigate("/");
   };
 
+  // Helper to get floor suffix
   const getSuffix = (n) => {
     const j = n % 10, k = n % 100;
     if (j === 1 && k !== 11) return `${n}st`;
@@ -37,6 +35,13 @@ function Dashboard() {
     ...Array.from({ length: 27 }, (_, i) => `${getSuffix(i + 1)} Floor`),
   ];
 
+  // Helper to extract uploader username from filename
+  const getUploaderFromFilename = (filename) => {
+    if (!filename) return "Unknown";
+    const parts = filename.split('-');
+    return parts[0] || "Unknown"; // first part is assumed as username
+  };
+
   const fetchImages = async () => {
     try {
       setLoading(true);
@@ -48,13 +53,14 @@ function Dashboard() {
       });
       const data = await response.json();
 
-      // Local today date
+      // Today's date in YYYY-MM-DD format
       const today = new Date();
       const yyyy = today.getFullYear();
       const mm = String(today.getMonth() + 1).padStart(2, '0');
       const dd = String(today.getDate()).padStart(2, '0');
       const todayStr = `${yyyy}-${mm}-${dd}`;
 
+      // Filter images uploaded today
       const approvedTodayImages = data.filter(
         (img) =>
           img.taskImage?.includes(todayStr) &&
@@ -63,12 +69,11 @@ function Dashboard() {
 
       setImages(approvedTodayImages);
     } catch (err) {
-      console.error(err);
+      console.error("Error fetching images:", err);
     } finally {
       setLoading(false);
     }
   };
-
 
   useEffect(() => {
     fetchImages();
@@ -76,9 +81,8 @@ function Dashboard() {
 
   return (
     <div className="admin-container">
-      {/* Sidebar only for Admin Panel */}
+      {/* Sidebar */}
       <div className="sidebar">
-        {/* <div className="admin-title">Admin Panel</div> */}
         <ul className="sidebar-links">
           <li>
             <Link className="sidebar-link active" to="/dashboard">
@@ -100,7 +104,7 @@ function Dashboard() {
 
       {/* Main Dashboard */}
       <div className="dashboard-main">
-        {/* Topbar with logo, title, and logout */}
+        {/* Topbar */}
         <div className="dashboard-topbar">
           <div className="topbar-left">
             <img src={logo} alt="Logo" className="topbar-logo" />
@@ -128,7 +132,6 @@ function Dashboard() {
                     (img) => img.floorName.replace(/_/g, ' ') === floor
                   );
 
-
                   return (
                     <tr key={index}>
                       <td>{floor}</td>
@@ -146,6 +149,9 @@ function Dashboard() {
                                   }
                                 />
                                 <span className="image-label">{img.taskImage}</span>
+                                <span className="uploaded-by">
+                                  👤 {img.uploadedBy?.username || getUploaderFromFilename(img.taskImage)}
+                                </span>
                               </div>
                             ))}
                           </div>
@@ -163,7 +169,7 @@ function Dashboard() {
 
         {/* Footer */}
         <div className="dashboard-footer">
-          © {new Date().getFullYear()} Cogent Safety and Security Pvt Ltd. All rights reserved.
+          abc
         </div>
 
         {/* Image Preview Modal */}
