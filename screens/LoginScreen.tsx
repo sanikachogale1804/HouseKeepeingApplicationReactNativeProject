@@ -43,15 +43,15 @@ const LoginScreen: React.FC = () => {
   const handleLogin = async () => {
 
     try {
-      const localhostIP = 'http://10.0.2.2:5005';
+      const localhostIP = 'http://10.0.2.2:5005'; 
       const localNetworkIP = 'http://192.168.1.92:5005';
-      const publicIP = 'http://45.115.186.228:5005';
+      const publicIP   = 'http://45.115.186.228:5005'; 
+      const baseUrl = __DEV__ ? localhostIP : publicIP;
 
-      const baseUrl = __DEV__ ? localNetworkIP : publicIP;
       const url = `${baseUrl}/login?username=${username}&userPassword=${password}`;
 
       const response = await fetch(url);
-      const responseBody = await response.text(); // BACK TO TEXT
+      const responseBody = await response.text(); 
 
 
       if (response.ok) {
@@ -66,7 +66,7 @@ const LoginScreen: React.FC = () => {
         }
         const payload = JSON.parse(atob(tokenParts[1]));
 
-      
+
         const role = payload.role || payload.roles?.[0] || payload.authorities?.[0];
 
         if (!role || !role.toLowerCase().includes('housekeeper')) {
