@@ -43,15 +43,18 @@ const LoginScreen: React.FC = () => {
   const handleLogin = async () => {
 
     try {
-      const localhostIP = 'http://10.0.2.2:5005'; 
-      const localNetworkIP = 'http://192.168.1.92:5005';
-      const publicIP   = 'http://45.115.186.228:5005'; 
+      const localhostIP = 'https://10.0.2.2:5005'; 
+      const localNetworkIP = 'https://192.168.1.92:5005';
+      const publicIP = 'https://45.115.186.228:5005';
       const baseUrl = __DEV__ ? localhostIP : publicIP;
 
-      const url = `${baseUrl}/login?username=${username}&userPassword=${password}`;
+      // 🌐 Added fallback for local network and public IP
+      const reachableBaseUrl = localhostIP || localNetworkIP || publicIP;
+
+      const url = `${reachableBaseUrl}/login?username=${username}&userPassword=${password}`;
 
       const response = await fetch(url);
-      const responseBody = await response.text(); 
+      const responseBody = await response.text();
 
 
       if (response.ok) {
