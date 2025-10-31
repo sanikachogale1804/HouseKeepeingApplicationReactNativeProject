@@ -104,11 +104,14 @@ const FloorDataScreen = () => {
 
   const handleSubmit = async () => {
     try {
-      const lanIP = 'https://192.168.1.92:5005';
-      const publicIP = 'https://45.115.186.228:5005';
-      const baseUrl = __DEV__ ? lanIP : publicIP;
+      const localhostIP = 'http://10.0.2.2.:5005'
+      const lanIP = 'http://192.168.1.92:5005';
+      const publicIP = 'http://45.115.186.228:5005';
+      const reachableBaseUrl = __DEV__ ? lanIP : publicIP;
 
-      const response = await fetch(`${baseUrl}/floorData`, {
+      const reachablereachableBaseUrl = localhostIP || lanIP || publicIP;
+
+      const response = await fetch(`${reachableBaseUrl}/floorData`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ floorName, subFloorName, imageType }),
@@ -161,7 +164,7 @@ const FloorDataScreen = () => {
           type: image.type || 'image/jpeg',
         });
 
-        const uploadRes = await fetch(`${baseUrl}/floorData/${floorDataId}/image`, {
+        const uploadRes = await fetch(`${reachableBaseUrl}/floorData/${floorDataId}/image`, {
           method: 'POST',
           body: formData,
           headers: {

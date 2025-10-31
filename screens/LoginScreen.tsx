@@ -43,12 +43,11 @@ const LoginScreen: React.FC = () => {
   const handleLogin = async () => {
 
     try {
-      const localhostIP = 'https://10.0.2.2:5005'; 
-      const localNetworkIP = 'https://192.168.1.92:5005';
+      const localhostIP = 'http://10.0.2.2:5005'; 
+      const localNetworkIP = 'http://192.168.1.92:5005';
       const publicIP = 'https://45.115.186.228:5005';
       const baseUrl = __DEV__ ? localhostIP : publicIP;
 
-      // 🌐 Added fallback for local network and public IP
       const reachableBaseUrl = localhostIP || localNetworkIP || publicIP;
 
       const url = `${reachableBaseUrl}/login?username=${username}&userPassword=${password}`;
@@ -107,19 +106,19 @@ const LoginScreen: React.FC = () => {
 
         <TextInput
           placeholder="Username"
-          placeholderTextColor="#888" // 👈 ensure visible in dark mode
+          placeholderTextColor="#888" 
           value={username}
           onChangeText={setUsername}
-          style={[styles.input, { color: '#000' }]} // 👈 ensure typed text is black
+          style={[styles.input, { color: '#000' }]} 
           autoCapitalize="none"
         />
 
         <TextInput
           placeholder="Password"
-          placeholderTextColor="#888" // 👈 ensure visible in dark mode
+          placeholderTextColor="#888" 
           value={password}
           onChangeText={setPassword}
-          style={[styles.input, { color: '#000' }]} // 👈 ensure typed text is black
+          style={[styles.input, { color: '#000' }]} 
           secureTextEntry
         />
 
