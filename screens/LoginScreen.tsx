@@ -43,14 +43,14 @@ const LoginScreen: React.FC = () => {
   const handleLogin = async () => {
 
     try {
-      const localhostIP = 'http://10.0.2.2:5005'; 
+      const localhostIP = 'http://10.0.2.2:5005';
       const localNetworkIP = 'http://192.168.1.92:5005';
-      const publicIP = 'https://45.115.186.228:5005';
+      const publicIP = 'http://45.115.186.228:5005';
       const baseUrl = __DEV__ ? localhostIP : publicIP;
 
       const reachableBaseUrl = localhostIP || localNetworkIP || publicIP;
 
-      const url = `${reachableBaseUrl}/login?username=${username}&userPassword=${password}`;
+      const url = `${baseUrl}/login?username=${username}&userPassword=${password}`;
 
       const response = await fetch(url);
       const responseBody = await response.text();
@@ -106,19 +106,19 @@ const LoginScreen: React.FC = () => {
 
         <TextInput
           placeholder="Username"
-          placeholderTextColor="#888" 
+          placeholderTextColor="#888"
           value={username}
           onChangeText={setUsername}
-          style={[styles.input, { color: '#000' }]} 
+          style={[styles.input, { color: '#000' }]}
           autoCapitalize="none"
         />
 
         <TextInput
           placeholder="Password"
-          placeholderTextColor="#888" 
+          placeholderTextColor="#888"
           value={password}
           onChangeText={setPassword}
-          style={[styles.input, { color: '#000' }]} 
+          style={[styles.input, { color: '#000' }]}
           secureTextEntry
         />
 
