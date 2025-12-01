@@ -68,10 +68,12 @@ const LoginScreen: React.FC = () => {
         }
         const payload = JSON.parse(atob(tokenParts[1]));
 
-        // ✅ Save userId for FloorDataScreen
-        await AsyncStorage.setItem('userId', (payload.userId || payload.id).toString());
+        // Use username as identifier instead of userId
+        await AsyncStorage.setItem('username', username);
+
 
         const role = payload.role || payload.roles?.[0] || payload.authorities?.[0];
+
 
 
         if (!role || !role.toLowerCase().includes('housekeeper')) {
