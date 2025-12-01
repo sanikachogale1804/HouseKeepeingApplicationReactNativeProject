@@ -104,7 +104,7 @@ const FloorDataScreen = () => {
 
   const handleSubmit = async () => {
     try {
-      const localhostIP = 'http://10.0.2.2.:5005'
+      const localhostIP = 'http://10.0.2.2:5005'
       const lanIP = 'http://192.168.1.92:5005';
       const publicIP = 'http://45.115.186.228:5005';
       const reachableBaseUrl = __DEV__ ? lanIP : publicIP;
