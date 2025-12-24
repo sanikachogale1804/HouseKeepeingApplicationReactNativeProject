@@ -169,7 +169,7 @@ function Dashboard() {
 
         {/* Footer */}
         <div className="dashboard-footer">
-          abc
+          Cogent Safety and Security Pvt Ltd. All rights reserved.
         </div>
 
         {/* Image Preview Modal */}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { jwtDecode } from 'jwt-decode';
+import  { jwtDecode }  from 'jwt-decode';
 import Api_link from '../Config/apiconfig';
 import '../CSS/LoginForm.css';
 import logo from "../Images/logo.png";

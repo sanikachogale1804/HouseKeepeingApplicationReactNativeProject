@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Api_link from '../Config/apiconfig';
 
 function Supervisor() {
     const [images, setImages] = useState([]);
     const [loading, setLoading] = useState(false);
     const [previewImage, setPreviewImage] = useState(null);
-    
+
+    const navigate = useNavigate(); // Added for logout
+
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        navigate("/");
+    };
 
     const getSuffix = (n) => {
         const j = n % 10, k = n % 100;
@@ -21,7 +28,6 @@ function Supervisor() {
         const parts = filename.split('-');
         return parts[0] || "Unknown"; // first part is assumed as username
     };
-
 
     const floorOptionsEn = [
         'Basement 2',
@@ -90,7 +96,13 @@ function Supervisor() {
 
     return (
         <div className="supervisor-container">
-            <h2>Supervisor Dashboard</h2>
+            {/* Topbar with logout */}
+            <div className="dashboard-topbar">
+                <div className="topbar-left">
+                    <h2>Supervisor Dashboard</h2>
+                </div>
+                <button className="logout-btn" onClick={handleLogout}>Logout</button>
+            </div>
 
             <div className="supervisor-image-section">
                 <h3>Floor List with Today's Images</h3>
@@ -137,10 +149,7 @@ function Supervisor() {
                                                             <span className="uploaded-by">
                                                                 👤 {img.uploadedBy?.username || getUploaderFromFilename(img.taskImage)}
                                                             </span>
-
-
                                                         </div>
-
                                                     ))}
                                                 </div>
                                             ) : (
@@ -174,7 +183,6 @@ function Supervisor() {
                                                                 Approve
                                                             </button>
                                                         </div>
-
                                                     ))}
                                                 </div>
                                             ) : (
@@ -185,7 +193,6 @@ function Supervisor() {
                                 );
                             })}
                         </tbody>
-
                     </table>
                 )}
             </div>
